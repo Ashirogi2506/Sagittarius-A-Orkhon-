@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Onest } from "next/font/google";
+import { ThemeSync } from "@/components/ThemeSwitch";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
@@ -17,12 +18,15 @@ export const metadata: Metadata = {
 };
 
 // viewportFit "cover" lets the installed app use the whole screen; the bottom bar adds the safe-area padding itself.
-export const viewport: Viewport = { themeColor: "#003135", viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#FFF4C5", viewportFit: "cover" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="mn" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full bg-navy pb-[calc(4rem+env(safe-area-inset-bottom))] text-snow md:pb-0">{children}</body>
+      <body className="min-h-full bg-navy pb-[calc(4rem+env(safe-area-inset-bottom))] text-snow md:pb-0">
+        <ThemeSync />
+        {children}
+      </body>
     </html>
   );
 }

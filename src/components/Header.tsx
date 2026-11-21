@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useStore, isRelevant } from "@/lib/store";
 import { NotificationCenter } from "./NotificationCenter";
 import { AccountButton } from "./Account";
+import { ThemeSwitch } from "./ThemeSwitch";
 
 // The logo already links home; "about" is in the phone menu and at the bottom of the page.
 const NAV = [
@@ -41,7 +42,7 @@ export function Header() {
 
   return (
     <header className="editorial-navigation sticky top-0 z-40 border-b border-line bg-white">
-      <div className="mx-auto flex h-[68px] max-w-7xl items-center gap-4 px-4 md:px-6">
+      <div className="mx-auto flex h-[68px] max-w-7xl items-center gap-2 px-3 sm:gap-4 sm:px-4 md:px-6">
         <a href="#home" className="flex items-center gap-2.5" aria-label="SMART ORKHON нүүр">
           <Logo />
           <span className="whitespace-nowrap leading-tight">
@@ -63,6 +64,7 @@ export function Header() {
           )}
         </button>
         <AccountButton />
+        <ThemeSwitch />
         <a href="#app" className="hidden h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-action px-3 text-sm font-semibold text-snow transition-colors hover:bg-navy-3 xl:inline-flex"><Smartphone className="h-4 w-4" />Апп</a>
         {/* Phones use the bottom bar's «Цэс»; this button is for tablets and small laptops. */}
         <button type="button" className="hidden h-10 w-10 shrink-0 place-items-center rounded-xl border border-line bg-snow/5 md:grid xl:hidden" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-label="Цэс">

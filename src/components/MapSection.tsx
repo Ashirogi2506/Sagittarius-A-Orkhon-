@@ -9,6 +9,7 @@ import { DEMO_ISSUES, VERIFIED_SPOTS } from "@/lib/data/places";
 import { ISSUE_CAT, STATUS, fmtDate } from "@/lib/labels";
 import type { IssueStatus } from "@/lib/types";
 import { trafficColor, useStore } from "@/lib/store";
+import { useTheme } from "@/lib/theme";
 
 import { Badge, Button, Card, DemoTag, SectionHead, cn } from "./ui";
 
@@ -32,21 +33,24 @@ const LAYERS: { id: Layer; label: string; icon: typeof Car }[] = [
 
 export function MapSection() {
   const { askAI, traffic, prefs, alerts } = useStore();
-  const [mode, setMode] = useState<MapMode>("day");
+  const siteTheme = useTheme();
+  const [mapTheme, setMapTheme] = useState<MapMode | null>(null);
+  const mode = mapTheme ?? siteTheme;
   const [districtNumber, setDistrictNumber] = useState<number | null>(null);
   const district = MICRO_DISTRICTS.find((item) => item.number === districtNumber);
 
   useEffect(() => {
     const restoreMode = () => {
       try {
-        if (localStorage.getItem(MAP_MODE_KEY) === "night") setMode("night");
+        const saved = localStorage.getItem(MAP_MODE_KEY);
+        if (saved === "night" || saved === "day") setMapTheme(saved);
       } catch { /* The map still works when local storage is unavailable. */ }
     };
     restoreMode();
   }, []);
 
   const changeMode = (nextMode: MapMode) => {
-    setMode(nextMode);
+    setMapTheme(nextMode);
     try { localStorage.setItem(MAP_MODE_KEY, nextMode); } catch { /* The current selection still applies. */ }
   };
   // One layer at a time, so outages are never mixed up with road load or reported problems.

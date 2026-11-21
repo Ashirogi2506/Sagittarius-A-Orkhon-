@@ -1,24 +1,61 @@
 @import "tailwindcss";
 
 /* Shared theme tokens. Data visualizations and announcement emblems have their own colors. */
-:root {
+:root, .city-map-section[data-mode="day"] {
+  color-scheme: light;
   --orkhon-deep: #003135;
   --orkhon-dark: #024950;
   --orkhon-accent: #964734;
   --orkhon-turquoise: #0fa4af;
-  --orkhon-ice: #afdde5;
-  --navy: color-mix(in srgb, var(--orkhon-ice) 15%, white);
-  --navy-2: #fff;
-  --navy-3: var(--orkhon-ice);
+  --orkhon-ice: #f7e9b2;
+  --navy: #fff4c5;
+  --navy-2: #fffcf0;
+  --navy-3: #faeebc;
   --cyan: var(--orkhon-dark);
   --emerald: var(--orkhon-dark);
   --white: var(--orkhon-deep);
   --muted: var(--orkhon-dark);
-  --line: color-mix(in srgb, var(--orkhon-ice) 45%, #e5ebeb);
+  --line: #e6d8a6;
   --red: var(--orkhon-accent);
   --amber: var(--orkhon-accent);
   --deep: var(--orkhon-dark);
+  --action-ink: var(--orkhon-deep);
+  --focus-color: var(--orkhon-dark);
 }
+
+:root[data-theme="night"], .city-map-section[data-mode="night"] {
+  color-scheme: dark;
+  --orkhon-deep: #10101f;
+  --orkhon-dark: #211e35;
+  --orkhon-accent: #ff9a9d;
+  --orkhon-turquoise: #524094;
+  --orkhon-ice: #d8ccff;
+  --navy: #141424;
+  --navy-2: #211e35;
+  --navy-3: #302747;
+  --cyan: #d0bfff;
+  --emerald: #88d6b5;
+  --white: #f5f0ff;
+  --muted: #c3bbd2;
+  --line: #534869;
+  --red: #ff9a9d;
+  --amber: #f4cd83;
+  --deep: #10101f;
+  --action-ink: #fff;
+  --focus-color: var(--cyan);
+}
+
+/* Existing surface utilities also follow the active palette. */
+:root[data-theme="night"] :is(.bg-white, .bg-\[\#ffffff\]) { background-color: var(--navy-2); }
+:root[data-theme="night"] .bg-white\/90 { background-color: color-mix(in srgb, var(--navy-2) 90%, transparent); }
+:is(:root[data-theme="night"], .city-map-section[data-mode="night"]) .bg-action { color: var(--action-ink); }
+:is(:root[data-theme="night"], .city-map-section[data-mode="night"]) .bg-alert { background-color: #9b3448; }
+
+:root[data-theme-switching] :where(body, header, .bg-grid, .glass, .bg-white, .bg-navy, .bg-navy-2, .bg-navy-3, .bg-action) {
+  transition: background-color .26s ease, border-color .26s ease, color .26s ease;
+}
+:root[data-theme-switching] .city-theme-paint { transition: stop-color .28s ease, opacity .28s ease, fill .28s ease; }
+:root[data-theme-switching] .city-theme-terrain { transition: filter .28s ease; }
 
 @theme inline {
   --color-navy: var(--navy);
@@ -55,8 +92,8 @@ h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -0.02em; }
 p, li { text-wrap: pretty; }
 .font-display { font-feature-settings: normal; }
 
-.editorial-navigation a[aria-current="page"] { color: var(--orkhon-deep); background: var(--orkhon-ice); }
-.editorial-navigation nav a:hover { background: color-mix(in srgb, var(--orkhon-ice) 45%, white); }
+.editorial-navigation a[aria-current="page"] { color: var(--white); background: var(--navy-3); }
+.editorial-navigation nav a:hover { background: var(--navy-3); }
 .editorial-footer {
   --line: color-mix(in srgb, var(--orkhon-ice) 30%, var(--orkhon-dark));
   --white: #fff;
@@ -70,7 +107,7 @@ p, li { text-wrap: pretty; }
 .news-photo {
   background: var(--navy-3) url("/news/erdenet.jpg") center 56% / cover no-repeat;
 }
-.news-latest { background: color-mix(in srgb, var(--navy-3) 32%, white); }
+.news-latest { background: color-mix(in srgb, var(--navy-3) 38%, var(--navy-2)); }
 .news-latest li:nth-child(2) .news-thumbnail { background-position: 15% 60%; background-size: auto 120%; }
 .news-latest li:nth-child(3) .news-thumbnail { background-position: 83% center; background-size: auto 130%; }
 .news-headline { font-size: clamp(1.7rem, 3.7vw, 3.15rem); }
@@ -83,16 +120,17 @@ p, li { text-wrap: pretty; }
   height: 1.375rem;
   border-radius: .3125rem;
   vertical-align: middle;
-  color: var(--orkhon-dark);
+  color: var(--cyan);
   background: linear-gradient(135deg, color-mix(in srgb, currentColor 22%, transparent), color-mix(in srgb, currentColor 7%, transparent));
 }
-.news-filter { background: white; color: var(--muted); }
+.news-filter { background: var(--navy-2); color: var(--muted); }
 .news-filter:hover, .news-filter[aria-pressed="true"] { background: var(--navy-3); color: var(--white); border-color: var(--orkhon-turquoise); }
-.news-search:focus-within { border-color: var(--orkhon-turquoise); }
+:root[data-theme="night"] .news-filter[aria-pressed="true"] { background: var(--orkhon-turquoise); color: var(--action-ink); }
+.news-search:focus-within { border-color: var(--focus-color); }
 .news-search input:focus-visible { outline: none; }
 .news-search input::-webkit-search-cancel-button { appearance: none; }
 .news-link { color: var(--muted); text-decoration-color: var(--orkhon-turquoise); }
-.news-action { background: var(--orkhon-turquoise); color: var(--white); transition: background-color .18s; }
+.news-action { background: var(--orkhon-turquoise); color: var(--action-ink); transition: background-color .18s; }
 .news-action:hover { background: var(--navy-3); }
 .news-step {
   display: grid;
@@ -101,7 +139,7 @@ p, li { text-wrap: pretty; }
   height: 2.75rem;
   border: 1px solid var(--line);
   border-radius: .5rem;
-  background: white;
+  background: var(--navy-2);
   color: var(--white);
   transition: background-color .18s, border-color .18s;
 }
@@ -112,8 +150,7 @@ p, li { text-wrap: pretty; }
 .tabular-nums, time { font-variant-numeric: tabular-nums; }
 ::selection { background: var(--orkhon-ice); color: var(--orkhon-deep); }
 
-/* Hero ground: a quiet white band; the city card is the one picture on the page. */
-.bg-grid { background: #ffffff; }
+.bg-grid { background: var(--navy); }
 
 /* Cards: white on soft gray, a hairline border and one soft shadow. No blur, no glow. */
 .glass {
@@ -126,8 +163,49 @@ p, li { text-wrap: pretty; }
 
 .text-gradient { color: var(--white); }
 .focus-ring:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--orkhon-turquoise); outline-offset: 2px;
+  outline: 2px solid var(--focus-color); outline-offset: 2px;
 }
+
+.theme-switch {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 56px;
+  height: 36px;
+  padding-inline: 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--navy-3);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color .26s ease, border-color .26s ease;
+}
+.theme-switch-thumb {
+  position: absolute;
+  inset: 4px auto 4px 3px;
+  width: 26px;
+  border-radius: 50%;
+  background: var(--navy-2);
+  box-shadow: 0 1px 5px #0003;
+  transition: transform .26s cubic-bezier(.2, .75, .25, 1), background-color .26s ease;
+}
+.theme-switch[aria-checked="true"] .theme-switch-thumb {
+  transform: translateX(22px);
+  background: var(--orkhon-turquoise);
+}
+.theme-switch > svg {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  opacity: .55;
+  transform: rotate(-25deg) scale(.88);
+  transition: opacity .26s ease, transform .26s ease;
+}
+.theme-switch[aria-checked="false"] .theme-switch-sun,
+.theme-switch[aria-checked="true"] .theme-switch-moon { opacity: 1; transform: rotate(0) scale(1); }
+.theme-switch[aria-checked="true"] .theme-switch-moon { color: var(--action-ink); }
 
 /* City illustration animations */
 @keyframes drive-r { from { transform: translateX(-120px); } to { transform: translateX(1320px); } }
@@ -158,12 +236,12 @@ p, li { text-wrap: pretty; }
 /* Leaflet: light tiles, white popups */
 .leaflet-container { background: var(--navy); font-family: var(--font-inter), "Segoe UI", system-ui, sans-serif; font-size: 13px; line-height: 1.5; border-radius: 0.5rem; }
 .map-dark .leaflet-tile { filter: saturate(.55) contrast(.96) brightness(1.02); }
-.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #fff; color: var(--white); border: 1px solid var(--line); box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--orkhon-deep) 25%, transparent); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--navy-2); color: var(--white); border: 1px solid var(--line); box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--orkhon-deep) 25%, transparent); }
 .leaflet-control-attribution { background: rgba(255, 255, 255, .85) !important; color: var(--orkhon-dark) !important; }
 .leaflet-control-attribution a { color: var(--orkhon-dark) !important; text-decoration-color: var(--orkhon-turquoise); }
 
 .city-map-section {
-  --district-stroke: var(--orkhon-dark);
+  --district-stroke: var(--cyan);
   --district-fill: var(--orkhon-turquoise);
 }
 .map-district-button {
@@ -180,12 +258,12 @@ p, li { text-wrap: pretty; }
 }
 .map-district-button:hover, .map-mode-toggle button:hover {
   background: var(--navy-3);
-  color: var(--orkhon-deep);
+  color: var(--white);
 }
 .map-district-button[aria-pressed="true"], .map-mode-toggle button[aria-pressed="true"] {
   border-color: var(--orkhon-turquoise);
   background: var(--orkhon-turquoise);
-  color: var(--orkhon-deep);
+  color: var(--action-ink);
 }
 .map-district-outline {
   stroke: var(--district-stroke);
@@ -197,8 +275,8 @@ p, li { text-wrap: pretty; }
   place-items: center;
   border: 1px solid var(--orkhon-dark);
   border-radius: 50%;
-  background: white;
-  color: var(--orkhon-deep);
+  background: var(--navy-2);
+  color: var(--white);
   font-size: .875rem;
   font-weight: 700;
 }
@@ -206,25 +284,16 @@ p, li { text-wrap: pretty; }
 .map-district-marker:hover, .map-district-marker.is-selected {
   background: var(--orkhon-turquoise);
   border-color: var(--orkhon-deep);
+  color: var(--action-ink);
 }
 
 .city-map-section[data-mode="night"] {
-  --navy: var(--orkhon-deep);
-  --navy-2: var(--orkhon-dark);
-  --white: #fff;
-  --muted: var(--orkhon-ice);
-  --cyan: var(--orkhon-ice);
-  --emerald: var(--orkhon-ice);
-  --amber: var(--orkhon-ice);
-  --line: color-mix(in srgb, var(--orkhon-ice) 38%, var(--orkhon-deep));
-  --district-stroke: var(--orkhon-ice);
   background: var(--navy);
   color: var(--white);
 }
 .city-map-section[data-mode="night"] .city-leaflet .leaflet-tile {
   filter: invert(1) hue-rotate(170deg) saturate(.72) contrast(.94) brightness(.93);
 }
-.city-map-section[data-mode="night"] .bg-action { color: var(--orkhon-deep); }
 .city-map-section[data-mode="night"] .glass button.bg-white {
   background: var(--navy);
   color: var(--orkhon-ice);

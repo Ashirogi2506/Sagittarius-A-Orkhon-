@@ -5,6 +5,7 @@ import { ArrowRight, Bot, Map as MapIcon, MapPin, Megaphone, X } from "lucide-re
 import { useState } from "react";
 import { CityIllustration, type ZoneId } from "./CityIllustration";
 import { useStore } from "@/lib/store";
+import { useTheme } from "@/lib/theme";
 import { DEMO_ISSUES } from "@/lib/data/places";
 import { Badge, Button, DemoTag, buttonVariants } from "./ui";
 import { WeatherChip } from "./WeatherChip";
@@ -20,6 +21,7 @@ const ZONES: Record<ZoneId, { title: string; text: string; area?: string; tags: 
 
 export function Hero() {
   const [zone, setZone] = useState<ZoneId | null>(null);
+  const night = useTheme() === "night";
   const { askAI, prefs, setPrefs } = useStore();
   const z = zone ? ZONES[zone] : null;
   const issues = z?.area ? DEMO_ISSUES.filter((i) => i.area === z.area && i.status !== "resolved").length : 0;
@@ -47,7 +49,7 @@ export function Hero() {
             <div className="relative overflow-hidden rounded-lg border border-line bg-navy-3 p-1">
               <span className="pointer-events-none absolute left-3 top-3 z-[1] rounded-md bg-white/90 px-2 py-1 text-[12.5px] font-semibold text-snow shadow-sm">Бүсэд дарж мэдээллийг харна</span>
               <div className="overflow-hidden rounded-md">
-                <CityIllustration onZone={setZone} active={zone} />
+                <CityIllustration onZone={setZone} active={zone} night={night} />
               </div>
             </div>
             <p className="mt-2 text-right text-[12.5px] text-muted">Уран сайхны дүрслэл, яг байршил биш.</p>
