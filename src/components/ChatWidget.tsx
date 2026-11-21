@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Bot, Send, Sparkles, X } from "lucide-react";
+import { Bot, Megaphone, Send, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import type { ChatMessage } from "@/lib/types";
@@ -113,6 +113,13 @@ export function ChatWidget() {
           </motion.div>
         )}
       </AnimatePresence>
+      {!chatOpen && (
+        <a href="#report"
+          className="fixed bottom-[calc(8.5rem+env(safe-area-inset-bottom))] right-4 z-50 flex h-12 items-center gap-2 rounded-full bg-cyan px-4 font-semibold text-white shadow-[0_10px_28px_-10px_rgba(31,95,191,.6)] transition-colors hover:bg-[#184c9c] md:bottom-24 md:right-6 md:h-14">
+          <Megaphone className="h-5 w-5" aria-hidden="true" />
+          <span>Асуудал мэдээлэх</span>
+        </a>
+      )}
       <motion.button type="button" onClick={() => setChatOpen(!chatOpen)} whileTap={{ scale: 0.96 }}
         className={cn("fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-50 flex h-12 items-center md:bottom-6 md:right-6 md:h-14 gap-2 rounded-full bg-cyan pl-4 pr-5 font-semibold text-white shadow-[0_10px_28px_-10px_rgba(31,95,191,.6)] transition-colors hover:bg-[#184c9c]", chatOpen && "max-md:hidden")}
         aria-label={chatOpen ? "Орхон AI туслахыг хаах" : "Орхон AI туслахыг нээх"} aria-expanded={chatOpen}>
