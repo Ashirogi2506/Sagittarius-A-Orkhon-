@@ -21,15 +21,14 @@ export function LocationPicker({ compact = false }: { compact?: boolean }) {
         </select>
       </label>
       <label className="flex flex-col gap-1 text-xs font-semibold text-muted">
-        Баг <span className="font-normal text-muted/70">(жишээ жагсаалт)</span>
-        <select className={inputCls} value={prefs.bag} onChange={(e) => setPrefs({ ...prefs, bag: e.target.value })}>
-          <option value="">Бүх баг</option>
-          {sum.bags.map((b) => <option key={b}>{b}</option>)}
+        Баг
+        <select className={inputCls} value="" disabled aria-label="Багийн мэдээлэл холбогдоогүй">
+          <option value="">Мэдээлэлгүй</option>
         </select>
       </label>
       <label className="flex flex-col gap-1 text-xs font-semibold text-muted">
         Хороолол
-        <select className={inputCls} value={prefs.area} onChange={(e) => setPrefs({ ...prefs, area: e.target.value })}>
+        <select className={inputCls} value={prefs.area} onChange={(e) => setPrefs({ ...prefs, bag: "", area: e.target.value })}>
           <option value="">Бүх хороолол</option>
           {sum.areas.map((a) => <option key={a}>{a}</option>)}
         </select>

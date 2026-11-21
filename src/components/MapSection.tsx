@@ -1,13 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { AlertCircle, Bot, CalendarDays, Car, MapPin, ShieldCheck, X, Zap } from "lucide-react";
+import { AlertCircle, Bot, CalendarDays, Car, MapPin, X, Zap } from "lucide-react";
 import { useState } from "react";
 import { ALERT_KIND, ALERT_LEVEL, OUTAGE_KINDS, isOpen, type AlertKind } from "@/lib/civic";
-import { DEMO_ISSUES, VERIFIED_SPOTS } from "@/lib/data/places";
+import { DEMO_ISSUES } from "@/lib/data/places";
 import { ISSUE_CAT, STATUS, fmtDate } from "@/lib/labels";
 import type { IssueStatus } from "@/lib/types";
 import { trafficColor, useStore } from "@/lib/store";
+import { TRAFFIC_AREAS, trafficArea, type TrafficArea } from "@/lib/trafficAreas";
 
 import { Badge, Button, Card, DemoTag, SectionHead, cn } from "./ui";
 
@@ -30,20 +31,19 @@ export function MapSection() {
   const [status, setStatus] = useState<"all" | IssueStatus>("all");
   const [kinds, setKinds] = useState<AlertKind[]>(OUTAGE_KINDS);
   const [selected, setSelected] = useState<string | null>(null);
-  const [spot, setSpot] = useState<string | null>(null);
   const [camName, setCamName] = useState<string | null>(null);
   const [outageId, setOutageId] = useState<number | null>(null);
-  const [showVerified, setShowVerified] = useState(false);
+  const [trafficRegion, setTrafficRegion] = useState<TrafficArea>("all");
   const showTraffic = layer === "traffic";
   const issues = layer === "issues" ? DEMO_ISSUES.filter((i) => status === "all" || i.status === status) : [];
   const sel = DEMO_ISSUES.find((i) => i.id === selected);
-  const sp = VERIFIED_SPOTS.find((s) => s.id === spot);
-  const cameras = showTraffic && traffic?.ok ? traffic.spots : [];
+  const allCameras = showTraffic && prefs.topics.traffic && traffic?.ok ? traffic.spots : [];
+  const cameras = trafficRegion === "all" ? allCameras : allCameras.filter((c) => trafficArea(c.lat, c.lng) === trafficRegion);
   const cam = cameras.find((c) => c.name === camName);
   const openOutages = (alerts ?? []).filter((a) => OUTAGE_KINDS.includes(a.kind) && isOpen(a));
   const outages = layer === "outages" ? openOutages.filter((a) => kinds.includes(a.kind) && a.lat != null && a.lng != null) : [];
   const outage = outages.find((a) => a.id === outageId);
-  const clear = () => { setSelected(null); setSpot(null); setCamName(null); setOutageId(null); };
+  const clear = () => { setSelected(null); setCamName(null); setOutageId(null); };
 
   return (
     <section id="map" className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14" aria-labelledby="map-title">
@@ -72,7 +72,16 @@ export function MapSection() {
           </>
         )}
         {layer === "traffic" && (
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted"><input type="checkbox" className="h-4 w-4 accent-[#1f5fbf]" checked={showVerified} onChange={(e) => setShowVerified(e.target.checked)} />Шалгасан замын цэгүүд</label>
+          <div className="flex w-full items-center gap-2 overflow-x-auto" role="group" aria-label="Хотын төвөөс ойролцоох чиглэлээр шүүх">
+            {TRAFFIC_AREAS.map((area) => (
+              <button key={area.id} type="button" aria-pressed={trafficRegion === area.id}
+                onClick={() => { clear(); setTrafficRegion(area.id); }}
+                className={cn("min-h-11 shrink-0 rounded-md border px-3 text-sm font-semibold", trafficRegion === area.id ? "border-cyan bg-cyan/15 text-cyan" : "border-line text-muted hover:text-snow")}>
+                {area.label}
+              </button>
+            ))}
+            <span className="shrink-0 text-xs text-muted">Хотын төвөөс ойролцоогоор</span>
+          </div>
         )}
         {layer === "outages" && OUTAGE_KINDS.map((k) => (
           <button key={k} type="button" aria-pressed={kinds.includes(k)} onClick={() => { setOutageId(null); setKinds((x) => (x.includes(k) ? x.filter((y) => y !== k) : [...x, k])); }}
@@ -89,12 +98,32 @@ export function MapSection() {
         </p>
       )}
       <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-        <div className="glass relative min-w-0 overflow-hidden rounded-lg p-1.5">
-          <LeafletMap issues={issues} selected={selected} onSelect={(id) => { clear(); setSelected(id); }} showVerified={showTraffic && showVerified} onSelectSpot={(id) => { clear(); setSpot(id); }}
+        <div className="glass isolate relative min-w-0 overflow-hidden rounded-lg p-1.5">
+          <LeafletMap issues={issues} selected={selected} onSelect={(id) => { clear(); setSelected(id); }} showVerified={false} onSelectSpot={() => {}}
             cameras={cameras} selectedCam={camName} onSelectCam={(n) => { clear(); setCamName(n); }}
             outages={outages} selectedOutage={outageId} onSelectOutage={(id) => { clear(); setOutageId(id); }} />
+          {showTraffic && cam && (
+            <div className="absolute right-3 top-3 z-[1000] max-w-[70%] rounded-lg border border-line bg-navy-2 p-3 shadow-md lg:hidden">
+              <button type="button" onClick={() => setCamName(null)} aria-label="Хаах" className="float-right ml-2 rounded p-1"><X className="h-4 w-4" /></button>
+              <p className="text-sm font-semibold">{cam.name}</p>
+              <p className="mt-1 text-xs font-semibold" style={{ color: trafficColor(cam.rank) }}>{cam.levelLabel}</p>
+              <a href="https://dedtuv.erdenet.mn/live" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-xs font-semibold text-cyan">Шууд камер ↗</a>
+            </div>
+          )}
+          {showTraffic && (
+            <div role="group" aria-label="Замын ачааллын тэмдэглэгээ"
+              className="pointer-events-none absolute bottom-4 left-3 z-[1000] max-w-[calc(100%-1.5rem)] rounded-lg border border-line bg-navy-2 px-3 py-2 text-xs font-semibold shadow-md">
+              <p className="mb-1 text-muted">Камерын ойролцоо</p>
+              <div className="flex flex-wrap gap-x-3 gap-y-1.5">{([[0, "Бага"], [1, "Дунд"], [2, "Их"], [-1, "Мэдээлэлгүй"]] as const).map(([rank, label]) => (
+                <span key={rank} className="flex items-center gap-1.5">
+                  <span className={cn("h-3 w-3 rounded-full border-2", rank < 0 && "border-dashed")} style={{ borderColor: trafficColor(rank) }} aria-hidden="true" />
+                  {label}
+                </span>
+              ))}</div>
+            </div>
+          )}
         </div>
-        <Card className="flex min-w-0 flex-col p-5">
+        <Card className={cn("flex min-w-0 flex-col p-5", showTraffic && "hidden lg:flex")}>
           {layer === "outages" ? (
             outage ? (
               <div>
@@ -163,15 +192,6 @@ export function MapSection() {
               <div className="mt-4 flex flex-wrap gap-2"><DemoTag /><DemoTag>Жишээ байршил</DemoTag></div>
               <Button className="mt-4 w-full" variant="ghost" size="sm" onClick={() => askAI(`${sel.area} орчимд ямар асуудал байна?`)}><Bot className="h-4 w-4" />AI-аас асуух</Button>
             </div>
-          ) : sp ? (
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                <Badge className="border-emerald/40 bg-emerald/10 text-emerald"><ShieldCheck className="h-3 w-3" />Баталгаатай байршил</Badge>
-                <button type="button" onClick={() => setSpot(null)} className="grid h-7 w-7 place-items-center rounded-lg hover:bg-snow/10" aria-label="Хаах"><X className="h-4 w-4" /></button>
-              </div>
-              <h3 className="mt-3 text-lg font-semibold">{sp.name}</h3>
-              <p className="mt-2 text-sm text-muted">{sp.note}</p>
-            </div>
           ) : (
             <div className="flex h-full flex-col">
               {layer === "issues" && (
@@ -187,28 +207,10 @@ export function MapSection() {
               )}
               {showTraffic && (
                 <>
-                  <h3 className="font-semibold">Замын ачаалал (камер)</h3>
-                  <ul className="mt-3 space-y-2.5 text-sm">
-                    {([[0, "Ачаалалгүй"], [1, "Дунд зэргийн ачаалалтай"], [2, "Ачаалал ихтэй"], [-1, "Мэдээлэлгүй (тооллогогүй)"]] as const).map(([r, l]) => (
-                      <li key={r} className="flex items-center gap-2.5"><span className={cn("h-3.5 w-3.5 rounded-full border-[3px] bg-navy", r < 0 && "border-dashed")} style={{ borderColor: trafficColor(r) }} />{l}
-                        <span className="ml-auto text-muted">{cameras.filter((c) => (r === 2 ? c.rank >= 2 : c.rank === r)).length}</span></li>
-                    ))}
-                    <li className="flex items-center gap-2.5"><span className="h-1.5 w-5 rounded-full" style={{ background: "linear-gradient(90deg,#22c55e,#b7791f,#d63c3c)" }} />Гол зам: камерын {250} м радиуст өнгөтэй</li>
-                    <li className="flex items-center gap-2.5"><span className="h-1 w-5 rounded-full bg-[#64748b] opacity-60" />Камергүй хэсэг (мэдээлэлгүй)</li>
-                    <li className="flex items-center gap-2.5"><span className="grid h-4 w-4 place-items-center rounded border border-cyan text-[11px] text-cyan">✓</span>Шалгасан замын цэг (OSM)</li>
-                  </ul>
-                  {cameras.some((c) => c.rank >= 1) && (
-                    <ul className="mt-3 space-y-1 text-sm">
-                      {cameras.filter((c) => c.rank >= 1).map((c) => (
-                        <li key={c.name}><button type="button" onClick={() => { clear(); setCamName(c.name); }} className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-snow/5">
-                          <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: trafficColor(c.rank) }} /><span className="truncate">{c.name}</span>
-                        </button></li>
-                      ))}
-                    </ul>
-                  )}
+                  <h3 className="font-semibold">Замын ачаалал</h3>
                 </>
               )}
-              <p className="mt-5 text-sm text-muted">{layer === "issues" ? "Цэг дээр дарж дэлгэрэнгүйг харна." : "Камер эсвэл өнгөтэй зам дээр дарж дэлгэрэнгүйг харна."}</p>
+              <p className="mt-5 text-sm text-muted">{layer === "issues" ? "Цэг дээр дарж дэлгэрэнгүйг харна." : "Газрын зураг дээрх цэгийг дарна уу."}</p>
               <ul className="mt-5 space-y-1.5 overflow-y-auto text-sm">
                 {issues.slice(0, 6).map((i) => (
                   <li key={i.id}><button type="button" onClick={() => setSelected(i.id)} className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-snow/5">

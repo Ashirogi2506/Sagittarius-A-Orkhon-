@@ -19,6 +19,45 @@
   --deep: #eef2f7;    /* footer */
 }
 
+[data-theme="night"] {
+  --navy: #0b1421;
+  --navy-2: #142232;
+  --navy-3: #1c3043;
+  --cyan: #87b8ff;
+  --emerald: #65d3a6;
+  --white: #edf3fa;
+  --muted: #a9b9ca;
+  --line: #2c4255;
+  --glass: #142232;
+  --red: #ff7c80;
+  --amber: #f1bd6a;
+  --green: #65d3a6;
+  --deep: #101c2a;
+}
+
+/* White surfaces in the original light design become dark surfaces without changing white text on buttons. */
+[data-theme="night"] .bg-white { background-color: var(--navy-2); }
+[data-theme="night"] .bg-cyan { background-color: #2459a7; }
+[data-theme="night"] .bg-alert { background-color: #b52b37; }
+[data-theme="night"] .bg-emerald { background-color: #147455; }
+[data-theme="night"] .bg-grid { background: var(--navy); }
+[data-theme="night"] .leaflet-popup-content-wrapper,
+[data-theme="night"] .leaflet-popup-tip { background: var(--navy-2); }
+[data-theme="night"] .map-dark .leaflet-tile { filter: brightness(.72) saturate(.7); }
+
+/* Editorial palette is scoped to the news area so other civic services keep their meaning. */
+.editorial {
+  --navy: #f7fbfb; --navy-2: #fff; --navy-3: #eaf5f6;
+  --cyan: #024950; --white: #003135; --muted: #4f686a;
+  --line: #cddfe0; --red: #964734; --amber: #964734; --emerald: #024950;
+  color: var(--white);
+}
+[data-theme="night"] .editorial {
+  --navy: #003135; --navy-2: #024950; --navy-3: #003135;
+  --cyan: #0FA4AF; --white: #f2fafa; --muted: #AFDDE5;
+  --line: #50777a; --red: #AFDDE5; --amber: #AFDDE5; --emerald: #AFDDE5;
+}
+
 @theme inline {
   --color-navy: var(--navy);
   --color-navy-2: var(--navy-2);

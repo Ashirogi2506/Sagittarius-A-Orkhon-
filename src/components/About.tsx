@@ -64,7 +64,7 @@ export function Toast() {
     <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[60] flex justify-center px-4" role="status" aria-live="polite">
       <AnimatePresence>
         {toast && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} className="rounded-xl border border-cyan/30 bg-[#ffffff] px-4 py-2.5 text-sm font-semibold shadow-xl">{toast}</motion.div>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} className="rounded-xl border border-cyan/30 bg-white px-4 py-2.5 text-sm font-semibold shadow-xl">{toast}</motion.div>
         )}
       </AnimatePresence>
     </div>

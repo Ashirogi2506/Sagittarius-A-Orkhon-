@@ -124,7 +124,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     /* eslint-disable react-hooks/set-state-in-effect */
     const saved = read("so.prefs", DEFAULT_PREFS);
     // Area names were renamed from "N-р микрорайон" to "N-р микро".
-    setPrefsState({ ...saved, topics: { ...DEFAULT_PREFS.topics, ...saved.topics }, area: (saved.area || "").replace("микрорайон", "микро") });
+    setPrefsState({ ...saved, bag: "", topics: { ...DEFAULT_PREFS.topics, ...saved.topics }, area: (saved.area || "").replace("микрорайон", "микро") });
     setRead(read("so.read", []));
     setReports(read("so.reports", []));
     setVoted(read("so.voted", []));

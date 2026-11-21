@@ -23,10 +23,10 @@ export default function Home() {
         <Hero />
         <AlertsSection />
         <Announcements />
-        <ReportSection />
         <MapSection />
         <ServicesSection />
         <VisitorSection />
+        <ReportSection />
         <ResultsSection />
         <AppSection />
       </main>
