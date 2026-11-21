@@ -4,6 +4,11 @@
    Token names (navy/cyan/emerald/snow) are kept so every component keeps working:
    navy = page ground, snow = main text, cyan = primary blue. */
 :root {
+  --orkhon-deep: #003135;
+  --orkhon-dark: #024950;
+  --orkhon-accent: #964734;
+  --orkhon-turquoise: #0fa4af;
+  --orkhon-ice: #afdde5;
   --navy: #f5f7fa;    /* soft gray page ground */
   --navy-2: #ffffff;  /* card surface */
   --navy-3: #eef2f7;  /* inset / pressed surface */
@@ -52,6 +57,84 @@ body {
 h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -0.02em; }
 p, li { text-wrap: pretty; }
 .font-display { font-feature-settings: normal; }
+
+.editorial-news, .editorial-navigation {
+  --navy: #f6f8f8;
+  --navy-2: #fff;
+  --navy-3: var(--orkhon-ice);
+  --white: var(--orkhon-deep);
+  --muted: var(--orkhon-dark);
+  --cyan: var(--orkhon-turquoise);
+  --red: var(--orkhon-accent);
+  --amber: var(--orkhon-accent);
+  --emerald: var(--orkhon-dark);
+  --line: color-mix(in srgb, var(--orkhon-ice) 45%, #e5ebeb);
+  color: var(--white);
+}
+
+.editorial-navigation a[aria-current="page"] { color: var(--orkhon-deep); background: var(--orkhon-ice); }
+.editorial-navigation nav a:hover { background: color-mix(in srgb, var(--orkhon-ice) 45%, white); }
+.editorial-footer {
+  --deep: var(--orkhon-dark);
+  --line: color-mix(in srgb, var(--orkhon-ice) 30%, var(--orkhon-dark));
+  --white: #fff;
+  --muted: var(--orkhon-ice);
+  --cyan: var(--orkhon-ice);
+  color: white;
+}
+.editorial-footer .footer-source { background: var(--orkhon-deep); }
+.editorial-footer .footer-source:hover { background: var(--orkhon-dark); border-color: var(--orkhon-turquoise); }
+
+.news-photo {
+  background: var(--navy-3) url("/news/erdenet.jpg") center 56% / cover no-repeat;
+}
+.news-latest { background: color-mix(in srgb, var(--navy-3) 32%, white); }
+.news-latest li:nth-child(2) .news-thumbnail { background-position: 15% 60%; background-size: auto 120%; }
+.news-latest li:nth-child(3) .news-thumbnail { background-position: 83% center; background-size: auto 130%; }
+.news-headline { font-size: clamp(1.7rem, 3.7vw, 3.15rem); }
+.news-category { color: var(--muted); font-size: .875rem; font-weight: 700; }
+.news-emblem {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 1.375rem;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: .3125rem;
+  vertical-align: middle;
+  background: var(--orkhon-ice);
+  color: var(--orkhon-dark);
+}
+.news-emblem:is([data-category="traffic"], [data-category="emergency"]) {
+  background: var(--orkhon-accent);
+  color: white;
+}
+.news-emblem:is([data-category="water"], [data-category="transport"]) {
+  background: var(--orkhon-turquoise);
+  color: var(--orkhon-deep);
+}
+.news-filter { background: white; color: var(--muted); }
+.news-filter:hover, .news-filter[aria-pressed="true"] { background: var(--navy-3); color: var(--white); border-color: var(--cyan); }
+.news-search:focus-within { border-color: var(--cyan); }
+.news-search input:focus-visible { outline: none; }
+.news-search input::-webkit-search-cancel-button { appearance: none; }
+.news-link { color: var(--muted); text-decoration-color: var(--cyan); }
+.news-action { background: var(--cyan); color: var(--white); transition: background-color .18s; }
+.news-action:hover { background: var(--navy-3); }
+.news-step {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--line);
+  border-radius: .5rem;
+  background: white;
+  color: var(--white);
+  transition: background-color .18s, border-color .18s;
+}
+.news-step:hover { background: var(--navy-3); border-color: var(--cyan); }
+.news-card { transition: border-color .18s; }
+.news-card:hover { border-color: var(--cyan); }
+
 .tabular-nums, time { font-variant-numeric: tabular-nums; }
 ::selection { background: rgba(31, 95, 191, 0.18); }
 

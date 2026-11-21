@@ -18,13 +18,13 @@ const MORE = [["#solved", "Үр дүн, санаа"], ["#app", "Апп тата�
 export function Logo() {
   return (
     <svg viewBox="0 0 40 40" className="h-9 w-9" aria-hidden="true">
-      <rect x="1" y="1" width="38" height="38" rx="10" fill="#eef2f7" />
-      <g fill="none" stroke="#1f5fbf" strokeLinecap="round">
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="var(--orkhon-ice)" />
+      <g fill="none" stroke="var(--orkhon-dark)" strokeLinecap="round">
         <ellipse cx="20" cy="19" rx="14" ry="10" strokeWidth="1.6" opacity=".45" />
         <ellipse cx="20" cy="19" rx="9.5" ry="6.6" strokeWidth="1.8" opacity=".75" />
         <ellipse cx="20" cy="19" rx="5" ry="3.4" strokeWidth="2" />
       </g>
-      <path d="M4 31 C 12 27, 18 34, 26 30 S 34 28, 37 29" fill="none" stroke="#6f9be0" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M4 31 C 12 27, 18 34, 26 30 S 34 28, 37 29" fill="none" stroke="var(--orkhon-turquoise)" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }
@@ -40,7 +40,7 @@ export function Header() {
   const openBell = () => { setFresh(unreadIds); setOpen(true); if (unread) markAllRead(); };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-white">
+    <header className="editorial-navigation sticky top-0 z-40 border-b border-line bg-white">
       <div className="mx-auto flex h-[68px] max-w-7xl items-center gap-4 px-4 md:px-6">
         <a href="#home" className="flex items-center gap-2.5" aria-label="SMART ORKHON нүүр">
           <Logo />
@@ -63,7 +63,7 @@ export function Header() {
           )}
         </button>
         <AccountButton />
-        <a href="#app" className="hidden h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-cyan px-3 text-sm font-semibold text-white transition-colors hover:bg-[#184c9c] xl:inline-flex"><Smartphone className="h-4 w-4" />Апп</a>
+        <a href="#app" className="hidden h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-cyan px-3 text-sm font-semibold text-snow transition-colors hover:bg-navy-3 xl:inline-flex"><Smartphone className="h-4 w-4" />Апп</a>
         {/* Phones use the bottom bar's «Цэс»; this button is for tablets and small laptops. */}
         <button type="button" className="hidden h-10 w-10 shrink-0 place-items-center rounded-xl border border-line bg-snow/5 md:grid xl:hidden" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-label="Цэс">
           {menu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

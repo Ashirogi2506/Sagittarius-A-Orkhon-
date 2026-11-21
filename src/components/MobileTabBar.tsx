@@ -40,7 +40,7 @@ export function MobileTabBar() {
             {/* Above the chat button (z-50) but stopping at the tab bar, which stays usable. */}
             <motion.div className="fixed inset-x-0 top-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-[51] bg-black/50 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSheet(false)} />
             <motion.nav aria-label="Бүх хэсэг" initial={{ y: "110%" }} animate={{ y: 0 }} exit={{ y: "110%" }} transition={{ type: "spring", damping: 30, stiffness: 320 }}
-              className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-[51] max-h-[75dvh] overflow-y-auto rounded-t-3xl border-t border-cyan/25 bg-[#eef2f7] px-4 pt-3 pb-4 md:hidden">
+              className="editorial-navigation fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-[51] max-h-[75dvh] overflow-y-auto rounded-t-3xl border-t border-cyan/25 bg-navy-3 px-4 pt-3 pb-4 md:hidden">
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-snow/20" />
               <div className="mb-3 flex items-center justify-between">
                 <p className="font-display font-semibold">Бүх хэсэг</p>
@@ -60,7 +60,7 @@ export function MobileTabBar() {
         )}
       </AnimatePresence>
 
-      <nav aria-label="Үндсэн цэс (гар утас)" className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav aria-label="Үндсэн цэс (гар утас)" className="editorial-navigation fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
         <ul className="mx-auto grid h-16 max-w-md grid-cols-5">
           {TABS.map(({ href, label, icon: I, primary }) => {
             const on = !sheet && active === href;
@@ -69,7 +69,7 @@ export function MobileTabBar() {
                 <a href={href} onClick={() => setSheet(false)} aria-current={on ? "page" : undefined}
                   className={cn("flex flex-col items-center justify-center gap-0.5 text-[11.5px] font-semibold", on ? "text-cyan" : "text-muted")}>
                   {primary
-                    ? <span className="-mt-5 grid h-12 w-12 place-items-center rounded-lg bg-cyan text-white"><I className="h-5 w-5" /></span>
+                    ? <span className="-mt-5 grid h-12 w-12 place-items-center rounded-lg bg-cyan text-snow"><I className="h-5 w-5" /></span>
                     : <I className="h-5 w-5" />}
                   {label}
                 </a>

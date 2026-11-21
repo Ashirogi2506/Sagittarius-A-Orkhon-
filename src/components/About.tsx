@@ -22,7 +22,7 @@ const SOURCES: [string, string][] = [
 /** News-site style footer: about, emergency numbers, sources and credits in one place. */
 export function Footer() {
   return (
-    <footer id="about" className="scroll-mt-20 border-t-2 border-snow bg-[var(--deep)]" aria-labelledby="about-title">
+    <footer id="about" className="editorial-footer scroll-mt-20 border-t-2 border-[var(--orkhon-deep)] bg-[var(--deep)]" aria-labelledby="about-title">
       <h2 id="about-title" className="sr-only">Бидний тухай</h2>
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-[1.3fr_1fr_1fr] md:px-6">
         <div>
@@ -46,7 +46,7 @@ export function Footer() {
           {SOURCES.map(([name, url]) => (
             <li key={url}>
               <a href={url} target="_blank" rel="noopener noreferrer"
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-[13px] text-muted transition-colors hover:border-cyan/50 hover:text-snow">
+                className="footer-source inline-flex min-h-10 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] text-muted transition-colors hover:text-snow">
                 {name}<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
               </a>
             </li>
