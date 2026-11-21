@@ -1,0 +1,29 @@
+name: Publish Android preview APK
+
+on:
+  push:
+    branches: [mobile-apk]
+    paths: [.github/workflows/publish-android-preview.yml]
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download completed APK
+        uses: actions/download-artifact@v4
+        with:
+          name: smart-orkhon-android-apk
+          run-id: 44862065152
+          github-token: ${{ github.token }}
+          path: apk
+      - name: Publish preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mv apk/app-release.apk apk/Smart-Orkhon-preview.apk
+          gh release create android-preview-20261121 apk/Smart-Orkhon-preview.apk --target eb4b23f0408f6b50634a319d705b6d86f324135c --title "Smart Orkhon Android preview" --notes "Preview build for testing. Includes example alerts; backend and Google Maps key are not configured." --prerelease
