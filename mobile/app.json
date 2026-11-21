@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Smart Orkhon",
+    "slug": "smart-orkhon-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "mn.smartorkhon.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#061322",
+        "foregroundImage": "./assets/smart-orkhon-icon.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
