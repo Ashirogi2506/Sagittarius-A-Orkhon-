@@ -1,8 +1,9 @@
 "use client";
 
 import L from "leaflet";
-import { useEffect, useMemo } from "react";
-import { MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
+import { Fragment, useEffect, useMemo } from "react";
+import { MapContainer, Marker, Polygon, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
+import { MICRO_DISTRICTS, type MicroDistrict } from "@/lib/data/micro-districts";
 import { ERDENET, VERIFIED_SPOTS } from "@/lib/data/places";
 import { ROADS } from "@/lib/data/roads";
 import { STATUS } from "@/lib/labels";
@@ -58,10 +59,34 @@ function roadRuns(cams: CameraSpot[]): Run[] {
   return runs.filter((r) => r.pts.length >= 2);
 }
 
-function FlyTo({ target }: { target: [number, number] | null }) {
+const cityBounds = L.latLngBounds(MICRO_DISTRICTS.flatMap(({ outline, center }) => outline ?? [center]));
+
+function MapFocus({ district, lat, lng }: { district?: MicroDistrict; lat?: number; lng?: number }) {
   const map = useMap();
-  useEffect(() => { if (target) map.flyTo(target, 16, { duration: 0.8 }); }, [target, map]);
+  useEffect(() => {
+    const animate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (district && !district.outline) {
+      map.setView(district.center, 16, { animate });
+      return;
+    }
+    const bounds = district?.outline ? L.latLngBounds(district.outline) : cityBounds;
+    map.fitBounds(bounds, { padding: [34, 34], maxZoom: district ? 16 : 14, animate });
+  }, [district, map]);
+  useEffect(() => {
+    if (lat === undefined || lng === undefined) return;
+    const animate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    map.flyTo([lat, lng], 16, { duration: 0.8, animate });
+  }, [lat, lng, map]);
   return null;
+}
+
+function districtIcon(district: MicroDistrict, active: boolean) {
+  return L.divIcon({
+    className: "map-district-marker" + (active ? " is-selected" : "") + (district.outline ? "" : " is-point"),
+    html: String(district.number),
+    iconSize: [27, 27],
+    iconAnchor: [13.5, 13.5],
+  });
 }
 
 // Outage marker: emoji in a ring of the outage colour; a pulsing halo marks the urgent ones.
@@ -75,19 +100,43 @@ const outageIcon = (a: CivicAlert, active: boolean) => {
   });
 };
 
-export default function LeafletMap({ issues, selected, onSelect, showVerified, onSelectSpot, cameras = [], selectedCam = null, onSelectCam, outages = [], selectedOutage = null, onSelectOutage}: {
+export default function LeafletMap({
+  issues, selected, onSelect, showVerified, onSelectSpot, cameras = [], selectedCam = null, onSelectCam,
+  outages = [], selectedOutage = null, onSelectOutage, district, onSelectDistrict,
+}: {
   issues: Issue[]; selected: string | null; onSelect: (id: string) => void; showVerified: boolean; onSelectSpot: (id: string) => void;
   cameras?: CameraSpot[]; selectedCam?: string | null; onSelectCam?: (name: string) => void;
   outages?: CivicAlert[]; selectedOutage?: number | null; onSelectOutage?: (id: number) => void;
+  district?: MicroDistrict;
+  onSelectDistrict: (number: number) => void;
 }) {
   const sel = issues.find((i) => i.id === selected);
   const cam = cameras.find((c) => c.name === selectedCam);
   const out = outages.find((a) => a.id === selectedOutage);
+  const target = sel ?? cam ?? out;
   const runs = useMemo(() => (cameras.length ? roadRuns(cameras) : []), [cameras]);
+  const districtMarkers = useMemo(() => MICRO_DISTRICTS.map((item) => districtIcon(item, district === item)), [district]);
   return (
-    <MapContainer center={ERDENET} zoom={14} scrollWheelZoom={false} className="map-dark h-[380px] w-full md:h-[520px]" attributionControl>
+    <MapContainer center={ERDENET} zoom={14} scrollWheelZoom={false} className="city-leaflet h-[380px] w-full md:h-[520px]" attributionControl>
       <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maxZoom={19}
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
+      {MICRO_DISTRICTS.map((item, index) => {
+        const active = district === item;
+        const select = { click: () => onSelectDistrict(item.number) };
+        return (
+          <Fragment key={item.number}>
+            {item.outline && (
+              <Polygon positions={item.outline} className="map-district-outline"
+                pathOptions={{ weight: active ? 3 : 1.5, fillOpacity: active ? 0.38 : 0.12 }}
+                eventHandlers={select} />
+            )}
+            <Marker position={item.center} icon={districtMarkers[index]} zIndexOffset={-150}
+              title={item.name} alt={item.name} eventHandlers={select}>
+              <Tooltip direction="top" offset={[0, -13]}>{item.name}</Tooltip>
+            </Marker>
+          </Fragment>
+        );
+      })}
       {runs.map((r) => (
         <Polyline key={r.key} positions={r.pts}
           pathOptions={{ color: trafficColor(r.rank), weight: r.rank < 0 ? (r.trunk ? 4 : 3) : (r.trunk ? 7 : 5), opacity: r.rank < 0 ? 0.45 : 0.9, lineCap: "round" }}
@@ -118,7 +167,7 @@ export default function LeafletMap({ issues, selected, onSelect, showVerified, o
           <Tooltip direction="top" offset={[0, -16]}>{ALERT_KIND[a.kind].icon} {a.title}{a.area ? ` · ${a.area}` : ""}</Tooltip>
         </Marker>
       ))}
-      <FlyTo target={sel ? [sel.lat, sel.lng] : cam ? [cam.lat, cam.lng] : out ? [out.lat!, out.lng!] : null} />
+      <MapFocus district={district} lat={target?.lat ?? undefined} lng={target?.lng ?? undefined} />
     </MapContainer>
   );
 }

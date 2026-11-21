@@ -1,9 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { AlertCircle, Bot, CalendarDays, Car, MapPin, ShieldCheck, X, Zap } from "lucide-react";
-import { useState } from "react";
+import { AlertCircle, Bot, CalendarDays, Car, MapPin, Moon, ShieldCheck, Sun, X, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ALERT_KIND, ALERT_LEVEL, OUTAGE_KINDS, isOpen, type AlertKind } from "@/lib/civic";
+import { MICRO_DISTRICTS } from "@/lib/data/micro-districts";
 import { DEMO_ISSUES, VERIFIED_SPOTS } from "@/lib/data/places";
 import { ISSUE_CAT, STATUS, fmtDate } from "@/lib/labels";
 import type { IssueStatus } from "@/lib/types";
@@ -13,9 +14,15 @@ import { Badge, Button, Card, DemoTag, SectionHead, cn } from "./ui";
 
 const LeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
-  loading: () => <div className="grid h-[380px] place-items-center rounded-[1.25rem] bg-navy-2 text-sm text-muted md:h-[520px]">Газрын зураг ачаалж байна…</div>,
+  loading: () => <div className="grid h-[380px] place-items-center rounded-lg bg-navy-2 text-sm text-muted md:h-[520px]">Газрын зураг ачаалж байна…</div>,
 });
 
+const MAP_MODE_KEY = "so.map-mode";
+const MAP_MODES = [
+  { id: "day", label: "Өдөр", icon: Sun },
+  { id: "night", label: "Шөнө", icon: Moon },
+] as const;
+type MapMode = (typeof MAP_MODES)[number]["id"];
 type Layer = "issues" | "traffic" | "outages";
 const LAYERS: { id: Layer; label: string; icon: typeof Car }[] = [
   { id: "issues", label: "Иргэдийн асуудал", icon: AlertCircle },
@@ -25,6 +32,23 @@ const LAYERS: { id: Layer; label: string; icon: typeof Car }[] = [
 
 export function MapSection() {
   const { askAI, traffic, prefs, alerts } = useStore();
+  const [mode, setMode] = useState<MapMode>("day");
+  const [districtNumber, setDistrictNumber] = useState<number | null>(null);
+  const district = MICRO_DISTRICTS.find((item) => item.number === districtNumber);
+
+  useEffect(() => {
+    const restoreMode = () => {
+      try {
+        if (localStorage.getItem(MAP_MODE_KEY) === "night") setMode("night");
+      } catch { /* The map still works when local storage is unavailable. */ }
+    };
+    restoreMode();
+  }, []);
+
+  const changeMode = (nextMode: MapMode) => {
+    setMode(nextMode);
+    try { localStorage.setItem(MAP_MODE_KEY, nextMode); } catch { /* The current selection still applies. */ }
+  };
   // One layer at a time, so outages are never mixed up with road load or reported problems.
   const [layer, setLayer] = useState<Layer>("issues");
   const [status, setStatus] = useState<"all" | IssueStatus>("all");
@@ -35,8 +59,9 @@ export function MapSection() {
   const [outageId, setOutageId] = useState<number | null>(null);
   const [showVerified, setShowVerified] = useState(false);
   const showTraffic = layer === "traffic";
-  const issues = layer === "issues" ? DEMO_ISSUES.filter((i) => status === "all" || i.status === status) : [];
-  const sel = DEMO_ISSUES.find((i) => i.id === selected);
+  const districtIssues = district ? DEMO_ISSUES.filter((issue) => issue.area === district.name) : DEMO_ISSUES;
+  const issues = layer === "issues" ? districtIssues.filter((i) => status === "all" || i.status === status) : [];
+  const sel = issues.find((i) => i.id === selected);
   const sp = VERIFIED_SPOTS.find((s) => s.id === spot);
   const cameras = showTraffic && traffic?.ok ? traffic.spots : [];
   const cam = cameras.find((c) => c.name === camName);
@@ -44,11 +69,39 @@ export function MapSection() {
   const outages = layer === "outages" ? openOutages.filter((a) => kinds.includes(a.kind) && a.lat != null && a.lng != null) : [];
   const outage = outages.find((a) => a.id === outageId);
   const clear = () => { setSelected(null); setSpot(null); setCamName(null); setOutageId(null); };
+  const selectDistrict = (number: number | null) => {
+    clear();
+    setDistrictNumber(number);
+  };
 
   return (
-    <section id="map" className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14" aria-labelledby="map-title">
+    <section id="map" data-mode={mode} className="city-map-section mx-auto max-w-7xl rounded-xl px-4 py-10 md:px-6 md:py-14" aria-labelledby="map-title">
       <SectionHead id="map-title" title="Газрын зураг"
         right={layer === "issues" ? <DemoTag>Асуудлын цэгүүд жишээ байршилтай</DemoTag> : undefined} />
+      <div className="mb-4 rounded-lg border border-line bg-navy-2 px-3 py-3 sm:px-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="flex items-center gap-2 font-semibold"><MapPin className="size-4 text-cyan" aria-hidden="true" />Микро хороолол</h3>
+          <div role="group" aria-label="Газрын зургийн горим" className="map-mode-toggle inline-flex gap-0.5 rounded-lg border border-line bg-navy p-0.5">
+            {MAP_MODES.map(({ id, label, icon: Icon }) => (
+              <button key={id} type="button" aria-pressed={mode === id} onClick={() => changeMode(id)}
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-md px-3 text-sm font-semibold">
+                <Icon className="size-4" aria-hidden="true" />{label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div role="group" aria-label="Микро хороолол сонгох" className="mt-2.5 flex flex-wrap gap-1.5">
+          <button type="button" aria-pressed={districtNumber === null} onClick={() => selectDistrict(null)} className="map-district-button">
+            Хот бүхэлдээ
+          </button>
+          {MICRO_DISTRICTS.map((item) => (
+            <button key={item.number} type="button" aria-pressed={districtNumber === item.number}
+              onClick={() => selectDistrict(item.number)} className="map-district-button">
+              {item.name}
+            </button>
+          ))}
+        </div>
+      </div>
       <div role="tablist" aria-label="Газрын зургийн давхарга" className="mb-3 inline-flex w-full flex-wrap gap-1 rounded-lg border border-line bg-navy p-1 sm:w-auto">
         {LAYERS.map(({ id, label, icon: Icon }) => (
           <button key={id} type="button" role="tab" aria-selected={layer === id} onClick={() => { clear(); setLayer(id); }}
@@ -63,7 +116,7 @@ export function MapSection() {
         {layer === "issues" && (
           <>
             {(["all", "new", "progress", "resolved"] as const).map((s) => (
-              <button key={s} type="button" aria-pressed={status === s} onClick={() => setStatus(s)}
+              <button key={s} type="button" aria-pressed={status === s} onClick={() => { setSelected(null); setStatus(s); }}
                 className={cn("flex items-center gap-2 rounded-md border px-3.5 py-1.5 text-sm font-semibold transition", status === s ? "border-cyan bg-cyan/15 text-snow" : "border-line text-muted hover:text-snow")}>
                 {s !== "all" && <span className="h-2.5 w-2.5 rounded-full" style={{ background: STATUS[s].color }} />}
                 {s === "all" ? "Бүгд" : STATUS[s].label}
@@ -92,9 +145,15 @@ export function MapSection() {
         <div className="glass relative min-w-0 overflow-hidden rounded-lg p-1.5">
           <LeafletMap issues={issues} selected={selected} onSelect={(id) => { clear(); setSelected(id); }} showVerified={showTraffic && showVerified} onSelectSpot={(id) => { clear(); setSpot(id); }}
             cameras={cameras} selectedCam={camName} onSelectCam={(n) => { clear(); setCamName(n); }}
-            outages={outages} selectedOutage={outageId} onSelectOutage={(id) => { clear(); setOutageId(id); }} />
+            outages={outages} selectedOutage={outageId} onSelectOutage={(id) => { clear(); setOutageId(id); }}
+            district={district} onSelectDistrict={selectDistrict} />
+          <p className="px-2 pb-0.5 pt-2 text-xs text-muted">
+            Микрогийн хүрээ нь <a href="https://www.openstreetmap.org/copyright" className="underline">OpenStreetMap</a>-ийн зураглал.
+            7-р микрог байршлын цэгээр харуулав.
+          </p>
         </div>
         <Card className="flex min-w-0 flex-col p-5">
+          {district && <p className="mb-3 border-b border-line pb-2 text-sm font-semibold" aria-live="polite">{district.name}</p>}
           {layer === "outages" ? (
             outage ? (
               <div>
@@ -180,7 +239,7 @@ export function MapSection() {
                   <ul className="mt-3 space-y-2.5 text-sm">
                     {(["new", "progress", "resolved"] as const).map((s) => (
                       <li key={s} className="flex items-center gap-2.5"><span className="h-3 w-3 rounded-full" style={{ background: STATUS[s].color }} />{STATUS[s].label}
-                        <span className="ml-auto text-muted">{DEMO_ISSUES.filter((i) => i.status === s).length}</span></li>
+                        <span className="ml-auto text-muted">{districtIssues.filter((i) => i.status === s).length}</span></li>
                     ))}
                   </ul>
                 </>
@@ -209,6 +268,7 @@ export function MapSection() {
                 </>
               )}
               <p className="mt-5 text-sm text-muted">{layer === "issues" ? "Цэг дээр дарж дэлгэрэнгүйг харна." : "Камер эсвэл өнгөтэй зам дээр дарж дэлгэрэнгүйг харна."}</p>
+              {layer === "issues" && district && !issues.length && <p className="mt-3 text-sm text-muted">Сонгосон шүүлтүүрт тохирох асуудал алга.</p>}
               <ul className="mt-5 space-y-1.5 overflow-y-auto text-sm">
                 {issues.slice(0, 6).map((i) => (
                   <li key={i.id}><button type="button" onClick={() => setSelected(i.id)} className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-snow/5">

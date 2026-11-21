@@ -161,6 +161,84 @@ p, li { text-wrap: pretty; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #fff; color: var(--white); border: 1px solid var(--line); box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--orkhon-deep) 25%, transparent); }
 .leaflet-control-attribution { background: rgba(255, 255, 255, .85) !important; color: var(--orkhon-dark) !important; }
 .leaflet-control-attribution a { color: var(--orkhon-dark) !important; text-decoration-color: var(--orkhon-turquoise); }
+
+.city-map-section {
+  --district-stroke: var(--orkhon-dark);
+  --district-fill: var(--orkhon-turquoise);
+}
+.map-district-button {
+  min-height: 2.75rem;
+  padding-inline: .75rem;
+  border: 1px solid var(--line);
+  border-radius: .375rem;
+  color: var(--muted);
+  font-size: .875rem;
+  font-weight: 600;
+}
+.map-mode-toggle button {
+  color: var(--muted);
+}
+.map-district-button:hover, .map-mode-toggle button:hover {
+  background: var(--navy-3);
+  color: var(--orkhon-deep);
+}
+.map-district-button[aria-pressed="true"], .map-mode-toggle button[aria-pressed="true"] {
+  border-color: var(--orkhon-turquoise);
+  background: var(--orkhon-turquoise);
+  color: var(--orkhon-deep);
+}
+.map-district-outline {
+  stroke: var(--district-stroke);
+  fill: var(--district-fill);
+}
+.map-district-outline:hover { fill-opacity: .3; }
+.map-district-marker {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--orkhon-dark);
+  border-radius: 50%;
+  background: white;
+  color: var(--orkhon-deep);
+  font-size: .875rem;
+  font-weight: 700;
+}
+.map-district-marker.is-point { border-style: dashed; }
+.map-district-marker:hover, .map-district-marker.is-selected {
+  background: var(--orkhon-turquoise);
+  border-color: var(--orkhon-deep);
+}
+
+.city-map-section[data-mode="night"] {
+  --navy: var(--orkhon-deep);
+  --navy-2: var(--orkhon-dark);
+  --white: #fff;
+  --muted: var(--orkhon-ice);
+  --cyan: var(--orkhon-ice);
+  --emerald: var(--orkhon-ice);
+  --amber: var(--orkhon-ice);
+  --line: color-mix(in srgb, var(--orkhon-ice) 38%, var(--orkhon-deep));
+  --district-stroke: var(--orkhon-ice);
+  background: var(--navy);
+  color: var(--white);
+}
+.city-map-section[data-mode="night"] .city-leaflet .leaflet-tile {
+  filter: invert(1) hue-rotate(170deg) saturate(.72) contrast(.94) brightness(.93);
+}
+.city-map-section[data-mode="night"] .bg-action { color: var(--orkhon-deep); }
+.city-map-section[data-mode="night"] .glass button.bg-white {
+  background: var(--navy);
+  color: var(--orkhon-ice);
+}
+.city-map-section[data-mode="night"] .leaflet-control-zoom a,
+.city-map-section[data-mode="night"] .leaflet-tooltip,
+.city-map-section[data-mode="night"] .leaflet-control-attribution {
+  background: var(--orkhon-deep) !important;
+  color: var(--orkhon-ice) !important;
+  border-color: var(--line);
+}
+.city-map-section[data-mode="night"] .leaflet-control-attribution a { color: var(--orkhon-ice) !important; }
+.city-map-section[data-mode="night"] .leaflet-tooltip-top::before { border-top-color: var(--orkhon-deep); }
+
 .marker-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; position: relative; }
 .marker-dot::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid currentColor; animation: pulse-ring 2s ease-out infinite; }
 
