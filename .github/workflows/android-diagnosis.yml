@@ -1,0 +1,62 @@
+name: Diagnose Android launch
+
+on:
+  push:
+    branches: [mobile-crash-diagnosis]
+    paths: [.github/workflows/android-diagnosis.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: npm ci
+        working-directory: mobile
+      - run: npx expo prebuild --platform android --no-install
+        working-directory: mobile
+      - name: Build emulator APK
+        working-directory: mobile/android
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=x86_64
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Launch app and inspect crash
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb install mobile/android/app/build/outputs/apk/release/app-release.apk
+            adb logcat -c
+            adb shell am start -n mn.smartorkhon.mobile/.MainActivity
+            sleep 25
+            adb logcat -d -v time > android-launch.log
+            echo "Relevant crash output:"
+            grep -i -A 50 -B 5 -E 'FATAL EXCEPTION|AndroidRuntime|ReactNativeJS|mn.smartorkhon.mobile.*(crash|exception|fatal)' android-launch.log | tail -n 200 || true
+            adb shell pidof mn.smartorkhon.mobile
+      - name: Save diagnostic log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-launch-log
+          path: android-launch.log
+          if-no-files-found: ignore
