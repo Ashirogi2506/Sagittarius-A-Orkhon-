@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+/* Palette: white and soft gray surfaces, one blue taken from the Orkhon river for everything you can act on.
+   Token names (navy/cyan/emerald/snow) are kept so every component keeps working:
+   navy = page ground, snow = main text, cyan = primary blue. */
+:root {
+  --navy: #f5f7fa;    /* soft gray page ground */
+  --navy-2: #ffffff;  /* card surface */
+  --navy-3: #eef2f7;  /* inset / pressed surface */
+  --cyan: #1f5fbf;    /* Orkhon blue: actions, links, focus */
+  --emerald: #12805c; /* success, resolved */
+  --white: #14213d;   /* ink: main text */
+  --muted: #5b6b82;   /* secondary text, 5.3:1 on white */
+  --line: #e2e7ee;
+  --glass: #ffffff;
+  --red: #d63c3c;
+  --amber: #b7791f;
+  --green: #12805c;
+  --deep: #eef2f7;    /* footer */
+}
+
+@theme inline {
+  --color-navy: var(--navy);
+  --color-navy-2: var(--navy-2);
+  --color-navy-3: var(--navy-3);
+  --color-cyan: var(--cyan);
+  --color-emerald: var(--emerald);
+  --color-snow: var(--white);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-alert: var(--red);
+  --color-warn: var(--amber);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-inter);
+  /* Smallest step is 13px instead of 12px: Cyrillic at 12px is tiring to read. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -0.02em; }
+p, li { text-wrap: pretty; }
+.font-display { font-feature-settings: normal; }
+.tabular-nums, time { font-variant-numeric: tabular-nums; }
+::selection { background: rgba(31, 95, 191, 0.18); }
+
+/* Hero ground: a quiet white band; the city card is the one picture on the page. */
+.bg-grid { background: #ffffff; }
+
+/* Cards: white on soft gray, a hairline border and one soft shadow. No blur, no glow. */
+.glass {
+  background: var(--navy-2);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+.glass-hover { transition: border-color .2s; }
+.glass-hover:hover { border-color: #b8c6da; }
+
+.text-gradient { color: var(--white); }
+.focus-ring:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--cyan); outline-offset: 2px;
+}
+
+/* City illustration animations */
+@keyframes drive-r { from { transform: translateX(-120px); } to { transform: translateX(1320px); } }
+@keyframes drive-l { from { transform: translateX(1320px) scaleX(-1); } to { transform: translateX(-120px) scaleX(-1); } }
+@keyframes cloud { from { transform: translateX(-260px); } to { transform: translateX(1300px); } }
+@keyframes pulse-ring { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes glow { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes dash { to { stroke-dashoffset: -40; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes smoke { 0% { transform: translateY(0) scale(.6); opacity: .5; } 100% { transform: translateY(-60px) scale(1.8); opacity: 0; } }
+@keyframes blink { 0%, 92%, 100% { opacity: 1; } 95% { opacity: .2; } }
+
+.car-r { animation: drive-r linear infinite; }
+.car-l { animation: drive-l linear infinite; }
+.cloud { animation: cloud linear infinite; }
+.pulse-ring { transform-box: fill-box; transform-origin: center; animation: pulse-ring 2.2s ease-out infinite; }
+.lamp-glow { animation: glow 3s ease-in-out infinite; }
+.flow-line { stroke-dasharray: 6 8; animation: dash 1.6s linear infinite; }
+.smoke { transform-box: fill-box; transform-origin: center bottom; animation: smoke 5s ease-out infinite; }
+.window-blink { animation: blink 7s infinite; }
+.city-zone { cursor: pointer; transition: filter .25s; }
+.city-zone:hover, .city-zone:focus-visible { filter: brightness(1.12); outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+/* Leaflet: light tiles, white popups */
+.leaflet-container { background: #e9eef4; font-family: var(--font-inter), "Segoe UI", system-ui, sans-serif; font-size: 13px; line-height: 1.5; border-radius: 0.5rem; }
+.map-dark .leaflet-tile { filter: saturate(.55) contrast(.96) brightness(1.02); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #ffffff; color: var(--white); border: 1px solid var(--line); box-shadow: 0 10px 30px -12px rgba(20, 33, 61, .25); }
+.leaflet-control-attribution { background: rgba(255, 255, 255, .85) !important; color: #5b6b82 !important; }
+.leaflet-control-attribution a { color: #1f5fbf !important; }
+.marker-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; position: relative; }
+.marker-dot::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid currentColor; animation: pulse-ring 2s ease-out infinite; }
+
+/* Live bus tracker markers (Google Maps advanced markers). --c is the route colour. */
+.bus-pin { position: relative; display: grid; place-items: center; width: 34px; height: 34px; transform: translateY(50%); }
+.bus-pin__arrow {
+  position: absolute; inset: 0; border-radius: 50%; background: var(--c); border: 2.5px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .45); transition: transform .6s ease;
+}
+/* A notch at the top of the disc points the way the bus is driving. */
+.bus-pin__arrow::after {
+  content: ""; position: absolute; left: 50%; top: -9px; transform: translateX(-50%);
+  border: 6px solid transparent; border-bottom: 9px solid #fff;
+}
+.bus-pin__arrow.is-unknown::after { display: none; }
+.bus-pin__tag { position: relative; font: 700 11px/1 var(--font-inter), system-ui, sans-serif; color: #0f1a2b; letter-spacing: -0.01em; }
+.bus-pin.is-stale .bus-pin__arrow { border-style: dashed; }
+.stop-pin { width: 13px; height: 13px; border-radius: 50%; background: #fff; border: 3.5px solid var(--c); box-shadow: 0 1px 4px rgba(0, 0, 0, .5); transform: translateY(50%); cursor: pointer; }
+.transit-info { display: grid; gap: 2px; font-family: var(--font-inter), system-ui, sans-serif; color: #14213d; }
+.transit-info span { font-size: 13px; color: #5b6b82; }
+@media (prefers-reduced-motion: reduce) { .bus-pin__arrow { transition: none; } }

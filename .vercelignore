@@ -1,0 +1,14 @@
+# Never upload secrets or the local database to Vercel.
+.env*
+!.env.example
+# Only the root ./data folder (local SQLite). Not src/lib/data, which is app code.
+/data
+*.db
+*.db-shm
+*.db-wal
+
+# Build output and dependencies are rebuilt on Vercel.
+/node_modules
+/.next
+tsconfig.tsbuildinfo
+next-env.d.ts
