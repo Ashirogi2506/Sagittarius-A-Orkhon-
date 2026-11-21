@@ -77,7 +77,8 @@ function CategoryLabel({ category, className }: { category: "all" | Announcement
   const Icon = CAT_ICON[category];
   return (
     <span className={cn("inline-flex items-center gap-1.5", className)}>
-      <span className="news-emblem" data-category={category} aria-hidden="true">
+      <span className="news-emblem" data-category={category} aria-hidden="true"
+        style={category === "all" ? undefined : { color: ANN_CAT[category].color }}>
         <Icon className="size-[15px]" strokeWidth={1.6} />
       </span>
       {category === "all" ? "Бүгд" : ANN_CAT[category].label}

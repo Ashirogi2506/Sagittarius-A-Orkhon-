@@ -103,7 +103,7 @@ export function NotificationCenter({ open, fresh, onClose }: { open: boolean; fr
                       {TOPICS.map(([k, l]) => (
                         <label key={k} className="flex cursor-pointer items-center justify-between rounded-xl border border-line px-3.5 py-2.5 text-sm">
                           {l}
-                          <input type="checkbox" className="h-4 w-4 accent-[#1f5fbf]" checked={prefs.topics[k]} onChange={(e) => setPrefs({ ...prefs, topics: { ...prefs.topics, [k]: e.target.checked } })} />
+                          <input type="checkbox" className="h-4 w-4 accent-cyan" checked={prefs.topics[k]} onChange={(e) => setPrefs({ ...prefs, topics: { ...prefs.topics, [k]: e.target.checked } })} />
                         </label>
                       ))}
                     </div>
@@ -112,7 +112,7 @@ export function NotificationCenter({ open, fresh, onClose }: { open: boolean; fr
                     <h3 className="mb-3 text-sm font-bold">Мэдэгдэл хүлээн авах суваг</h3>
                     <label className="flex cursor-pointer items-center justify-between rounded-xl border border-cyan/30 bg-cyan/5 px-3.5 py-2.5 text-sm">
                       <span className="flex items-center gap-2"><BellRing className="h-4 w-4 text-cyan" />Хөтчийн мэдэгдэл</span>
-                      <input type="checkbox" className="h-4 w-4 accent-[#1f5fbf]" checked={prefs.browserNotify} onChange={(e) => enableBrowser(e.target.checked)} />
+                      <input type="checkbox" className="h-4 w-4 accent-cyan" checked={prefs.browserNotify} onChange={(e) => enableBrowser(e.target.checked)} />
                     </label>
                     {[[Smartphone, "SMS"], [Mail, "Имэйл"], [MessageSquare, "Push мэдэгдэл (апп)"]].map(([Icon, l]) => {
                       const I = Icon as typeof Mail;

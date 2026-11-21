@@ -1,27 +1,23 @@
 @import "tailwindcss";
 
-/* Palette: white and soft gray surfaces, one blue taken from the Orkhon river for everything you can act on.
-   Token names (navy/cyan/emerald/snow) are kept so every component keeps working:
-   navy = page ground, snow = main text, cyan = primary blue. */
+/* Shared theme tokens. Data visualizations and announcement emblems have their own colors. */
 :root {
   --orkhon-deep: #003135;
   --orkhon-dark: #024950;
   --orkhon-accent: #964734;
   --orkhon-turquoise: #0fa4af;
   --orkhon-ice: #afdde5;
-  --navy: #f5f7fa;    /* soft gray page ground */
-  --navy-2: #ffffff;  /* card surface */
-  --navy-3: #eef2f7;  /* inset / pressed surface */
-  --cyan: #1f5fbf;    /* Orkhon blue: actions, links, focus */
-  --emerald: #12805c; /* success, resolved */
-  --white: #14213d;   /* ink: main text */
-  --muted: #5b6b82;   /* secondary text, 5.3:1 on white */
-  --line: #e2e7ee;
-  --glass: #ffffff;
-  --red: #d63c3c;
-  --amber: #b7791f;
-  --green: #12805c;
-  --deep: #eef2f7;    /* footer */
+  --navy: color-mix(in srgb, var(--orkhon-ice) 15%, white);
+  --navy-2: #fff;
+  --navy-3: var(--orkhon-ice);
+  --cyan: var(--orkhon-dark);
+  --emerald: var(--orkhon-dark);
+  --white: var(--orkhon-deep);
+  --muted: var(--orkhon-dark);
+  --line: color-mix(in srgb, var(--orkhon-ice) 45%, #e5ebeb);
+  --red: var(--orkhon-accent);
+  --amber: var(--orkhon-accent);
+  --deep: var(--orkhon-dark);
 }
 
 @theme inline {
@@ -29,6 +25,7 @@
   --color-navy-2: var(--navy-2);
   --color-navy-3: var(--navy-3);
   --color-cyan: var(--cyan);
+  --color-action: var(--orkhon-turquoise);
   --color-emerald: var(--emerald);
   --color-snow: var(--white);
   --color-muted: var(--muted);
@@ -58,24 +55,9 @@ h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -0.02em; }
 p, li { text-wrap: pretty; }
 .font-display { font-feature-settings: normal; }
 
-.editorial-news, .editorial-navigation {
-  --navy: #f6f8f8;
-  --navy-2: #fff;
-  --navy-3: var(--orkhon-ice);
-  --white: var(--orkhon-deep);
-  --muted: var(--orkhon-dark);
-  --cyan: var(--orkhon-turquoise);
-  --red: var(--orkhon-accent);
-  --amber: var(--orkhon-accent);
-  --emerald: var(--orkhon-dark);
-  --line: color-mix(in srgb, var(--orkhon-ice) 45%, #e5ebeb);
-  color: var(--white);
-}
-
 .editorial-navigation a[aria-current="page"] { color: var(--orkhon-deep); background: var(--orkhon-ice); }
 .editorial-navigation nav a:hover { background: color-mix(in srgb, var(--orkhon-ice) 45%, white); }
 .editorial-footer {
-  --deep: var(--orkhon-dark);
   --line: color-mix(in srgb, var(--orkhon-ice) 30%, var(--orkhon-dark));
   --white: #fff;
   --muted: var(--orkhon-ice);
@@ -101,24 +83,16 @@ p, li { text-wrap: pretty; }
   height: 1.375rem;
   border-radius: .3125rem;
   vertical-align: middle;
-  background: var(--orkhon-ice);
   color: var(--orkhon-dark);
-}
-.news-emblem:is([data-category="traffic"], [data-category="emergency"]) {
-  background: var(--orkhon-accent);
-  color: white;
-}
-.news-emblem:is([data-category="water"], [data-category="transport"]) {
-  background: var(--orkhon-turquoise);
-  color: var(--orkhon-deep);
+  background: linear-gradient(135deg, color-mix(in srgb, currentColor 22%, transparent), color-mix(in srgb, currentColor 7%, transparent));
 }
 .news-filter { background: white; color: var(--muted); }
-.news-filter:hover, .news-filter[aria-pressed="true"] { background: var(--navy-3); color: var(--white); border-color: var(--cyan); }
-.news-search:focus-within { border-color: var(--cyan); }
+.news-filter:hover, .news-filter[aria-pressed="true"] { background: var(--navy-3); color: var(--white); border-color: var(--orkhon-turquoise); }
+.news-search:focus-within { border-color: var(--orkhon-turquoise); }
 .news-search input:focus-visible { outline: none; }
 .news-search input::-webkit-search-cancel-button { appearance: none; }
-.news-link { color: var(--muted); text-decoration-color: var(--cyan); }
-.news-action { background: var(--cyan); color: var(--white); transition: background-color .18s; }
+.news-link { color: var(--muted); text-decoration-color: var(--orkhon-turquoise); }
+.news-action { background: var(--orkhon-turquoise); color: var(--white); transition: background-color .18s; }
 .news-action:hover { background: var(--navy-3); }
 .news-step {
   display: grid;
@@ -131,12 +105,12 @@ p, li { text-wrap: pretty; }
   color: var(--white);
   transition: background-color .18s, border-color .18s;
 }
-.news-step:hover { background: var(--navy-3); border-color: var(--cyan); }
+.news-step:hover { background: var(--navy-3); border-color: var(--orkhon-turquoise); }
 .news-card { transition: border-color .18s; }
-.news-card:hover { border-color: var(--cyan); }
+.news-card:hover { border-color: var(--orkhon-turquoise); }
 
 .tabular-nums, time { font-variant-numeric: tabular-nums; }
-::selection { background: rgba(31, 95, 191, 0.18); }
+::selection { background: var(--orkhon-ice); color: var(--orkhon-deep); }
 
 /* Hero ground: a quiet white band; the city card is the one picture on the page. */
 .bg-grid { background: #ffffff; }
@@ -148,11 +122,11 @@ p, li { text-wrap: pretty; }
   box-shadow: none;
 }
 .glass-hover { transition: border-color .2s; }
-.glass-hover:hover { border-color: #b8c6da; }
+.glass-hover:hover { border-color: var(--orkhon-turquoise); }
 
 .text-gradient { color: var(--white); }
 .focus-ring:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--cyan); outline-offset: 2px;
+  outline: 2px solid var(--orkhon-turquoise); outline-offset: 2px;
 }
 
 /* City illustration animations */
@@ -182,11 +156,11 @@ p, li { text-wrap: pretty; }
 }
 
 /* Leaflet: light tiles, white popups */
-.leaflet-container { background: #e9eef4; font-family: var(--font-inter), "Segoe UI", system-ui, sans-serif; font-size: 13px; line-height: 1.5; border-radius: 0.5rem; }
+.leaflet-container { background: var(--navy); font-family: var(--font-inter), "Segoe UI", system-ui, sans-serif; font-size: 13px; line-height: 1.5; border-radius: 0.5rem; }
 .map-dark .leaflet-tile { filter: saturate(.55) contrast(.96) brightness(1.02); }
-.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #ffffff; color: var(--white); border: 1px solid var(--line); box-shadow: 0 10px 30px -12px rgba(20, 33, 61, .25); }
-.leaflet-control-attribution { background: rgba(255, 255, 255, .85) !important; color: #5b6b82 !important; }
-.leaflet-control-attribution a { color: #1f5fbf !important; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #fff; color: var(--white); border: 1px solid var(--line); box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--orkhon-deep) 25%, transparent); }
+.leaflet-control-attribution { background: rgba(255, 255, 255, .85) !important; color: var(--orkhon-dark) !important; }
+.leaflet-control-attribution a { color: var(--orkhon-dark) !important; text-decoration-color: var(--orkhon-turquoise); }
 .marker-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; position: relative; }
 .marker-dot::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid currentColor; animation: pulse-ring 2s ease-out infinite; }
 
@@ -202,9 +176,9 @@ p, li { text-wrap: pretty; }
   border: 6px solid transparent; border-bottom: 9px solid #fff;
 }
 .bus-pin__arrow.is-unknown::after { display: none; }
-.bus-pin__tag { position: relative; font: 700 11px/1 var(--font-inter), system-ui, sans-serif; color: #0f1a2b; letter-spacing: -0.01em; }
+.bus-pin__tag { position: relative; font: 700 11px/1 var(--font-inter), system-ui, sans-serif; color: var(--white); letter-spacing: -0.01em; }
 .bus-pin.is-stale .bus-pin__arrow { border-style: dashed; }
 .stop-pin { width: 13px; height: 13px; border-radius: 50%; background: #fff; border: 3.5px solid var(--c); box-shadow: 0 1px 4px rgba(0, 0, 0, .5); transform: translateY(50%); cursor: pointer; }
-.transit-info { display: grid; gap: 2px; font-family: var(--font-inter), system-ui, sans-serif; color: #14213d; }
-.transit-info span { font-size: 13px; color: #5b6b82; }
+.transit-info { display: grid; gap: 2px; font-family: var(--font-inter), system-ui, sans-serif; color: var(--white); }
+.transit-info span { font-size: 13px; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .bus-pin__arrow { transition: none; } }

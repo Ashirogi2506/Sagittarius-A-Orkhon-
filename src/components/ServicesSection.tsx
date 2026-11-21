@@ -57,7 +57,7 @@ export function ServicesSection() {
         <div role="tablist" aria-label="Төрийн үйлчилгээ" className="flex rounded-xl border border-line bg-snow/5 p-1">
           {([["orgs", "Байгууллагууд"], ["fees", "Үйлчилгээний хураамж"]] as const).map(([k, l]) => (
             <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
-              className={cn("rounded-lg px-3.5 py-2 text-sm font-medium transition", tab === k ? "bg-cyan text-white" : "text-muted hover:text-snow")}>{l}</button>
+              className={cn("rounded-lg px-3.5 py-2 text-sm font-medium transition", tab === k ? "bg-action text-snow" : "text-muted hover:text-snow")}>{l}</button>
           ))}
         </div>
         <label className="relative min-w-[220px] flex-1">

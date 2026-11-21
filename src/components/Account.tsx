@@ -89,7 +89,7 @@ function AuthForm({ onDone }: { onDone: () => void }) {
           {mode === "register" && <p className="text-xs text-muted">8-аас дээш тэмдэгт</p>}{errors.password && <p className="text-xs text-alert">{errors.password}</p>}</Field>
         {mode === "register" && (
           <label className="flex cursor-pointer items-start gap-2 text-xs text-muted">
-            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#1f5fbf]" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-cyan" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
             <span>Миний нэр, имэйл, мэдээлсэн асуудал хадгалагдахыг зөвшөөрч байна, хүссэн үедээ устгана (<a href="/privacy" target="_blank" className="text-cyan underline">нууцлалын бодлого</a>).</span>
           </label>
         )}
@@ -160,7 +160,7 @@ function DeleteAccount({ onDone }: { onDone: () => void }) {
       {err && <p className="mt-2 text-xs text-alert" role="alert">{err}</p>}
       <div className="mt-3 flex gap-2">
         <Button type="button" variant="ghost" className="flex-1" onClick={() => { setOpen(false); setPassword(""); setErr(""); }}>Болих</Button>
-        <Button type="submit" className="flex-1 bg-alert text-white shadow-none hover:bg-[#e05a5a]" disabled={busy || password.length < 1}>{busy ? "Устгаж байна…" : "Устгах"}</Button>
+        <Button type="submit" className="flex-1 bg-alert text-white shadow-none hover:bg-snow" disabled={busy || password.length < 1}>{busy ? "Устгаж байна…" : "Устгах"}</Button>
       </div>
     </form>
   );

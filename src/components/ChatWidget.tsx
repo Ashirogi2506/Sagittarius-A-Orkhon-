@@ -74,7 +74,7 @@ export function ChatWidget() {
               {msgs.map((m, i) => (
                 <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
                   <div className={cn("max-w-[86%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
-                    m.role === "user" ? "rounded-br-md bg-cyan text-white" : m.mode === "error" ? "rounded-bl-md border border-alert/40 bg-alert/10" : "rounded-bl-md bg-navy-3")}>
+                    m.role === "user" ? "rounded-br-md bg-action text-snow" : m.mode === "error" ? "rounded-bl-md border border-alert/40 bg-alert/10" : "rounded-bl-md bg-navy-3")}>
                     {m.role === "assistant" ? <Linkify text={m.text} /> : m.text}
                     {m.warning && <p className="mt-2 text-xs text-muted">({m.warning})</p>}
                     {m.mode === "demo" && <p className="mt-2 border-t border-line pt-1.5 text-xs font-semibold text-warn">Урьдчилан бэлдсэн хариулт</p>}
@@ -107,14 +107,14 @@ export function ChatWidget() {
               <textarea id="chat-in" rows={1} value={input} onChange={(e) => setInput(e.target.value)} maxLength={1200}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
                 placeholder="Асуултаа бичнэ үү…" className="max-h-28 flex-1 resize-none rounded-xl border border-line bg-navy px-3.5 py-2.5 text-sm placeholder:text-muted/70 focus:border-cyan/60 focus:outline-none" />
-              <button type="submit" disabled={busy || !input.trim()} className="grid h-10 w-10 place-items-center rounded-xl bg-cyan text-white transition-colors hover:bg-[#184c9c] disabled:opacity-40" aria-label="Илгээх"><Send className="h-4 w-4" /></button>
+              <button type="submit" disabled={busy || !input.trim()} className="grid h-10 w-10 place-items-center rounded-xl bg-action text-snow transition-colors hover:bg-navy-3 disabled:opacity-40" aria-label="Илгээх"><Send className="h-4 w-4" /></button>
             </form>
             <p className="px-4 pb-2 text-center text-xs text-muted">Асуулт хадгалагдахгүй, утас, регистрийн дугаар автоматаар нуугдана.</p>
           </motion.div>
         )}
       </AnimatePresence>
       <motion.button type="button" onClick={() => setChatOpen(!chatOpen)} whileTap={{ scale: 0.96 }}
-        className={cn("fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-50 flex h-12 items-center md:bottom-6 md:right-6 md:h-14 gap-2 rounded-full bg-cyan pl-4 pr-5 font-semibold text-white shadow-[0_10px_28px_-10px_rgba(31,95,191,.6)] transition-colors hover:bg-[#184c9c]", chatOpen && "max-md:hidden")}
+        className={cn("fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-50 flex h-12 items-center md:bottom-6 md:right-6 md:h-14 gap-2 rounded-full bg-action pl-4 pr-5 font-semibold text-snow shadow-lg transition-colors hover:bg-navy-3", chatOpen && "max-md:hidden")}
         aria-label={chatOpen ? "Орхон AI туслахыг хаах" : "Орхон AI туслахыг нээх"} aria-expanded={chatOpen}>
         {chatOpen ? <X className="h-5 w-5" /> : <Sparkles className="h-5 w-5" />}<span className="hidden sm:inline">Орхон AI</span>
       </motion.button>

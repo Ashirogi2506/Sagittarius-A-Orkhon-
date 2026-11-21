@@ -11,8 +11,8 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-cyan text-white hover:bg-[#184c9c] active:bg-[#143f82]",
-        emerald: "bg-emerald text-white hover:bg-[#0e6b4c]",
+        primary: "bg-action text-snow hover:bg-navy-3 active:bg-cyan active:text-white",
+        emerald: "bg-emerald text-white hover:bg-snow",
         ghost: "border border-line bg-white text-snow hover:border-cyan/50 hover:text-cyan",
         subtle: "text-muted hover:text-snow hover:bg-snow/5",
       },
@@ -39,7 +39,6 @@ export function Badge({ className, children, color }: { className?: string; chil
   );
 }
 
-// The section name sits on a short blue rule: it repeats the nav label, so people can see where they landed.
 /** News-style section heading: one bold label over a thick rule, with an optional link or tag on the right. */
 export function SectionHead({ id, title, right }: { id?: string; title: string; right?: ReactNode }) {
   return (

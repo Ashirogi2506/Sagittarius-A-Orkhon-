@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 // viewportFit "cover" lets the installed app use the whole screen; the bottom bar adds the safe-area padding itself.
-export const viewport: Viewport = { themeColor: "#f5f7fa", viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#003135", viewportFit: "cover" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

@@ -29,7 +29,7 @@ export function ResultsSection() {
         <div className="mb-4 inline-flex rounded-lg border border-line bg-navy p-1" role="tablist" aria-label="Үр дүн">
           {tabs.map(([k, l, I]) => (
             <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
-              className={cn("inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-semibold transition", tab === k ? "bg-cyan text-white" : "text-muted hover:text-snow")}>
+              className={cn("inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-semibold transition", tab === k ? "bg-action text-snow" : "text-muted hover:text-snow")}>
               <I className="h-4 w-4" />{l}
             </button>
           ))}

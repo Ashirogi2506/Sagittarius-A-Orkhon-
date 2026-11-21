@@ -69,7 +69,7 @@ export function MobileTabBar() {
                 <a href={href} onClick={() => setSheet(false)} aria-current={on ? "page" : undefined}
                   className={cn("flex flex-col items-center justify-center gap-0.5 text-[11.5px] font-semibold", on ? "text-cyan" : "text-muted")}>
                   {primary
-                    ? <span className="-mt-5 grid h-12 w-12 place-items-center rounded-lg bg-cyan text-snow"><I className="h-5 w-5" /></span>
+                    ? <span className="-mt-5 grid h-12 w-12 place-items-center rounded-lg bg-action text-snow"><I className="h-5 w-5" /></span>
                     : <I className="h-5 w-5" />}
                   {label}
                 </a>

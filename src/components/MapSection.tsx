@@ -53,7 +53,7 @@ export function MapSection() {
         {LAYERS.map(({ id, label, icon: Icon }) => (
           <button key={id} type="button" role="tab" aria-selected={layer === id} onClick={() => { clear(); setLayer(id); }}
             className={cn("flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-2 text-sm font-semibold transition sm:flex-none",
-              layer === id ? "bg-cyan text-white" : "text-muted hover:bg-snow/5 hover:text-snow")}>
+              layer === id ? "bg-action text-snow" : "text-muted hover:bg-snow/5 hover:text-snow")}>
             <Icon className="h-4 w-4" />{label}
             {id === "outages" && openOutages.length > 0 && <span className={cn("rounded px-1.5 text-xs font-bold", layer === id ? "bg-navy/20" : "bg-alert text-white")}>{openOutages.length}</span>}
           </button>
@@ -72,7 +72,7 @@ export function MapSection() {
           </>
         )}
         {layer === "traffic" && (
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted"><input type="checkbox" className="h-4 w-4 accent-[#1f5fbf]" checked={showVerified} onChange={(e) => setShowVerified(e.target.checked)} />Шалгасан замын цэгүүд</label>
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted"><input type="checkbox" className="h-4 w-4 accent-cyan" checked={showVerified} onChange={(e) => setShowVerified(e.target.checked)} />Шалгасан замын цэгүүд</label>
         )}
         {layer === "outages" && OUTAGE_KINDS.map((k) => (
           <button key={k} type="button" aria-pressed={kinds.includes(k)} onClick={() => { setOutageId(null); setKinds((x) => (x.includes(k) ? x.filter((y) => y !== k) : [...x, k])); }}

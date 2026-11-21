@@ -44,7 +44,7 @@ export function Hero() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1 }} className="relative">
-            <div className="relative overflow-hidden rounded-lg border border-line bg-[#eef2f7] p-1">
+            <div className="relative overflow-hidden rounded-lg border border-line bg-navy-3 p-1">
               <span className="pointer-events-none absolute left-3 top-3 z-[1] rounded-md bg-white/90 px-2 py-1 text-[12.5px] font-semibold text-snow shadow-sm">Бүсэд дарж мэдээллийг харна</span>
               <div className="overflow-hidden rounded-md">
                 <CityIllustration onZone={setZone} active={zone} />

@@ -63,7 +63,7 @@ export function Header() {
           )}
         </button>
         <AccountButton />
-        <a href="#app" className="hidden h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-cyan px-3 text-sm font-semibold text-snow transition-colors hover:bg-navy-3 xl:inline-flex"><Smartphone className="h-4 w-4" />Апп</a>
+        <a href="#app" className="hidden h-10 shrink-0 items-center gap-1.5 rounded-[10px] bg-action px-3 text-sm font-semibold text-snow transition-colors hover:bg-navy-3 xl:inline-flex"><Smartphone className="h-4 w-4" />Апп</a>
         {/* Phones use the bottom bar's «Цэс»; this button is for tablets and small laptops. */}
         <button type="button" className="hidden h-10 w-10 shrink-0 place-items-center rounded-xl border border-line bg-snow/5 md:grid xl:hidden" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-label="Цэс">
           {menu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
