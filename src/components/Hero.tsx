@@ -27,7 +27,7 @@ export function Hero() {
   const issues = z?.area ? DEMO_ISSUES.filter((i) => i.area === z.area && i.status !== "resolved").length : 0;
 
   return (
-    <section id="home" className="bg-grid relative overflow-hidden" aria-labelledby="hero-title">
+    <section id="city-overview" className="bg-grid relative overflow-hidden" aria-labelledby="hero-title">
       <div className="mx-auto max-w-7xl px-4 pb-10 pt-8 md:px-6 md:pb-14 md:pt-12">
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.35fr]">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>

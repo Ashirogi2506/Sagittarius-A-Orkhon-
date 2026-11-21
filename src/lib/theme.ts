@@ -6,6 +6,7 @@ export type Theme = "day" | "night";
 const KEY = "so.theme";
 const EVENT = "smart-orkhon-theme";
 let fallback: Theme = "day";
+let transitionTimer: number | undefined;
 
 function subscribe(onChange: () => void) {
   window.addEventListener(EVENT, onChange);
@@ -32,6 +33,10 @@ export function useTheme(): Theme {
 }
 
 export function setTheme(value: Theme) {
+  const root = document.documentElement;
+  root.dataset.themeSwitching = "";
+  window.clearTimeout(transitionTimer);
+  transitionTimer = window.setTimeout(() => { delete root.dataset.themeSwitching; }, 400);
   fallback = value;
   try { window.localStorage.setItem(KEY, value); } catch { /* keep this tab's choice */ }
   window.dispatchEvent(new Event(EVENT));

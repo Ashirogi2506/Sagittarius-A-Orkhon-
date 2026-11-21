@@ -1,0 +1,127 @@
+.orkhon-chrome {
+  --chrome-soft: #afdde5;
+  --chrome-active: #0fa4af;
+  --chrome-on-active: #003135;
+  --chrome-dot: #964734;
+  color: var(--white);
+}
+
+:root:not([data-theme="night"]) .orkhon-chrome {
+  --navy: #f5fafb;
+  --navy-2: #fff;
+  --navy-3: #e5f3f5;
+  --cyan: #024950;
+  --white: #003135;
+  --muted: #024950;
+  --line: #cee4e7;
+  --glass: #fff;
+  --red: #964734;
+  --amber: #964734;
+}
+
+[data-theme="night"] .orkhon-chrome {
+  --chrome-soft: var(--line);
+  --chrome-active: var(--cyan);
+  --chrome-on-active: var(--deep);
+  --chrome-dot: var(--night-spark);
+}
+
+.orkhon-rail {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  background: var(--navy);
+  border-right: 1px solid var(--line);
+  scrollbar-width: thin;
+}
+
+.orkhon-topbar {
+  background: var(--navy-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.orkhon-nav-link {
+  display: flex;
+  min-height: 2.65rem;
+  align-items: center;
+  gap: .65rem;
+  border-radius: .6rem;
+  padding: .45rem .75rem;
+  color: var(--white);
+  font-size: .875rem;
+  font-weight: 650;
+  line-height: 1.25;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.orkhon-nav-link:hover,
+.orkhon-category-link:hover {
+  background: color-mix(in srgb, var(--chrome-soft) 44%, transparent);
+}
+
+.orkhon-nav-link[aria-current], .orkhon-mobile-action {
+  background: var(--chrome-active);
+  color: var(--chrome-on-active);
+}
+
+.orkhon-category-links > summary {
+  list-style: none;
+}
+
+.orkhon-category-links > summary::-webkit-details-marker {
+  display: none;
+}
+
+.orkhon-category-links[open] > summary > svg:last-child {
+  transform: rotate(180deg);
+}
+
+.orkhon-category-link {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  border-radius: .35rem;
+  padding: .25rem .4rem;
+  color: var(--muted);
+  font-size: .8125rem;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+.orkhon-category-link::before {
+  width: .3rem;
+  height: .3rem;
+  flex: none;
+  border-radius: 50%;
+  background: var(--chrome-active);
+  content: "";
+}
+
+.orkhon-toolbar-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: .6rem;
+  transition: background-color .15s ease;
+}
+
+.orkhon-toolbar-button:hover {
+  background: color-mix(in srgb, var(--chrome-soft) 36%, transparent);
+}
+
+.orkhon-notification-dot {
+  position: absolute;
+  top: .39rem;
+  right: .43rem;
+  width: .58rem;
+  height: .58rem;
+  border: 1px solid var(--navy-2);
+  border-radius: 50%;
+  background: var(--chrome-dot);
+}
+
+.orkhon-compact-menu {
+  border-top: 1px solid var(--line);
+  background: var(--navy-2);
+}

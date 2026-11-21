@@ -2,9 +2,10 @@
 
 import {
   ArrowLeft, ArrowRight, Bot, Bus, Car, ChevronDown, ChevronLeft, ChevronRight, Clock, Construction, Droplets, ExternalLink, Search,
-  Landmark, Leaf, MapPin, Trash2, TriangleAlert, Zap, type LucideIcon,
+  Landmark, Leaf, MapPin, Trash2, TriangleAlert, X, Zap, type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useStore, rankForUser } from "@/lib/store";
 import { ANN_CAT, VERIFY, fmtUB, relTime } from "@/lib/labels";
 import type { Announcement, AnnouncementCategory } from "@/lib/types";
@@ -41,6 +42,7 @@ const STATUS_WEIGHT: Record<string, number> = { live: 30, ongoing: 30, soon: 20,
 
 const place = (a: Announcement) => a.location.area || a.location.bag || a.location.sum;
 const isDemo = (a: Announcement) => a.verification === "demo" || a.verification === "unverified";
+const articleHref = (a: Announcement) => `/news/${encodeURIComponent(a.id)}`;
 // Live camera items carry car counts and clock times in their text; the title already says enough.
 const isLive = (a: Announcement) => a.verification === "live";
 const aiAsk = (a: Announcement) => `"${a.title}" гэсэн мэдэгдлийг энгийнээр тайлбарлаж өгөөч.`;
@@ -112,7 +114,7 @@ function AiButton({ a }: { a: Announcement }) {
 }
 
 function ArticleLink({ a }: { a: Announcement }) {
-  return <Link href={`/news/${encodeURIComponent(a.id)}`} className="inline-flex min-h-9 items-center gap-1 text-xs font-bold text-cyan hover:underline">Мэдээг нээх <ArrowRight className="h-3.5 w-3.5" /></Link>;
+  return <Link href={articleHref(a)} className="inline-flex min-h-9 items-center gap-1 text-xs font-bold text-cyan hover:underline">Мэдээг нээх <ArrowRight className="h-3.5 w-3.5" /></Link>;
 }
 
 function Tags({ a, st, mine }: { a: Announcement; st: Status; mine: boolean }) {
@@ -164,14 +166,15 @@ function Lead({ a, now, mine }: { a: Announcement; now: number | null; mine: boo
 function Side({ a, now }: { a: Announcement; now: number | null }) {
   const [open, toggle] = useOpen(a);
   return (
-    <li id={`ann-${a.id}`} className="relative scroll-mt-24 py-4">
-      <Watermark a={a} />
-      <button type="button" onClick={toggle} aria-expanded={open} className="flex w-full items-start gap-3 pr-8 text-left">
-        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-[#AFDDE5]/40 text-[#024950]" aria-hidden="true">{(() => { const Icon = CAT_ICON[a.category]; return <Icon className="h-5 w-5" />; })()}</span>
+    <li id={`ann-${a.id}`} className="scroll-mt-24 border-b border-line py-3 first:pt-0">
+      <button type="button" onClick={toggle} aria-expanded={open} className="news-hover flex w-full items-center gap-3 text-left">
+        <TopicArt category={a.category} compact />
         <span className="min-w-0 flex-1">
-          <span className="block text-[12px] font-bold uppercase tracking-wider text-cyan">{ANN_CAT[a.category].label}</span>
-          <span className="mt-0.5 line-clamp-3 text-[15px] font-semibold leading-snug md:text-base">{a.title}</span>
-          <span className="mt-1 block"><Byline a={a} now={now} /></span>
+          <span className="line-clamp-3 font-bold leading-snug">{a.title}</span>
+          <span className="mt-1.5 flex flex-wrap items-center gap-1 text-xs text-muted">
+            <Clock aria-hidden="true" className="h-3.5 w-3.5" /><When a={a} now={now} />
+            {isLive(a) && " · Шууд"}{isDemo(a) && " · Жишээ"}
+          </span>
         </span>
       </button>
       {open && (
@@ -184,19 +187,35 @@ function Side({ a, now }: { a: Announcement; now: number | null }) {
   );
 }
 
-/** Text-only story in the row under the lead. */
-function Column({ a, now }: { a: Announcement; now: number | null }) {
+function TopicArt({ category, compact = false }: { category: AnnouncementCategory; compact?: boolean }) {
+  const Icon = CAT_ICON[category];
+  return (
+    <span aria-hidden="true" className={cn("news-topic-art", compact && "news-topic-art--compact")} data-topic={category}>
+      <Icon strokeWidth={1.5} />
+    </span>
+  );
+}
+
+function Column({ a, now, wide }: { a: Announcement; now: number | null; wide: boolean }) {
   const [open, toggle] = useOpen(a);
   return (
-    <li id={`ann-${a.id}`} className="relative scroll-mt-24 rounded-xl border border-line bg-navy-2 p-5">
-      <Watermark a={a} className="top-3 md:top-0" />
-      <button type="button" onClick={toggle} aria-expanded={open} className="block w-full pr-8 text-left">
-        <span className="block text-[12px] font-bold uppercase tracking-wider text-cyan">{ANN_CAT[a.category].label}</span>
-        <span className="mt-0.5 block font-display text-[17px] font-bold leading-snug md:text-lg">{a.title}</span>
-        {!isLive(a) && <span className={cn("mt-1 block text-sm leading-relaxed text-muted", !open && "line-clamp-2")}>{a.summary}</span>}
+    <li id={`ann-${a.id}`} className={cn("relative scroll-mt-24 rounded-xl border border-line bg-navy-2", wide && "sm:col-span-2")}>
+      <button type="button" onClick={toggle} aria-expanded={open} className="news-hover flex w-full items-stretch text-left sm:block">
+        {wide ? <span className="news-city-art" role="img" aria-label="Эрдэнэт хотын төвийн ерөнхий зураг" /> : <TopicArt category={a.category} />}
+        <span className="relative block min-w-0 flex-1 px-3 py-3 sm:px-4">
+          <Watermark a={a} className="hidden sm:block" />
+          <span className="news-tag">{ANN_CAT[a.category].label}</span>
+          <span className={cn("mt-1.5 block font-bold leading-tight tracking-tight sm:pr-5", wide ? "text-base sm:text-[23px]" : "text-sm sm:text-base")}>{a.title}</span>
+          <span className="mt-1.5 block text-xs text-muted"><When a={a} now={now} />{isDemo(a) && " · Жишээ"}{isLive(a) && " · Шууд"}</span>
+        </span>
       </button>
-      <div className="mt-1.5"><Byline a={a} now={now} /></div>
-      {open && <div className="mt-3 grid gap-2"><Details a={a} /><AiButton a={a} /><ArticleLink a={a} /></div>}
+      {open && (
+        <div className="grid gap-2 border-t border-line px-4 py-3">
+          {!isLive(a) && <p className="text-sm">{a.summary}</p>}
+          <Byline a={a} now={now} /><Details a={a} />
+          <div className="flex flex-wrap gap-3"><AiButton a={a} /><ArticleLink a={a} /></div>
+        </div>
+      )}
     </li>
   );
 }
@@ -234,15 +253,73 @@ function Row({ a, now, mine }: { a: Announcement; now: number | null; mine: bool
   );
 }
 
-const FILTERS: ("all" | AnnouncementCategory)[] = ["all", "traffic", "water", "electricity", "road", "transport", "waste", "environment", "service", "emergency"];
+type NewsFilter = "all" | AnnouncementCategory;
+const PRIMARY_FILTERS = ["all", "traffic", "water", "electricity", "transport", "environment"] as const;
+const MORE_FILTERS = ["road", "waste", "service", "emergency"] as const;
+const ALL_FILTERS: readonly NewsFilter[] = [...PRIMARY_FILTERS, ...MORE_FILTERS];
+
+function NewsSearch({ query, onChange }: { query: string; onChange: (value: string) => void }) {
+  return (
+    <form role="search" className="news-search" onSubmit={(e) => {
+      e.preventDefault();
+      document.getElementById("notices")?.scrollIntoView({ block: "start" });
+    }}>
+      <Search className="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
+      <input aria-label="Мэдээлэл хайх" value={query} onChange={(e) => onChange(e.target.value)} placeholder="Мэдээ, мэдээлэл хайх…" />
+      {query && <button type="button" aria-label="Хайлтыг цэвэрлэх" onClick={() => onChange("")}><X className="h-4 w-4" /></button>}
+    </form>
+  );
+}
+
+function NewsHeading({ children }: { children: string }) {
+  return <h3 className="news-heading">{children}</h3>;
+}
+
+function Featured({ features, index, setIndex, now }: {
+  features: Announcement[];
+  index: number;
+  setIndex: (index: number) => void;
+  now: number | null;
+}) {
+  const a = features[index];
+  return (
+    <div aria-label="Онцлох мэдээлэл">
+      <article className="news-feature">
+        <div className="news-feature-photo" aria-hidden="true" />
+        <div className="news-feature-copy" aria-live="polite">
+          <span className="news-feature-label">Онцлох мэдээ</span>
+          <h3>{a.title}</h3>
+          <p className="line-clamp-3">{a.summary}</p>
+          <div className="news-feature-meta">
+            <span className="flex items-center gap-2"><Clock className="h-4 w-4" aria-hidden="true" /><When a={a} now={now} />{isDemo(a) && " · Жишээ"}</span>
+            <Link href={articleHref(a)} aria-label={`Дэлгэрэнгүй: ${a.title}`} className="news-feature-link"><ArrowRight className="h-5 w-5" /></Link>
+          </div>
+        </div>
+      </article>
+      <div className="news-feature-toolbar">
+        <a href="/news/credits.txt" target="_blank" rel="noreferrer" className="text-xs text-muted underline">Эрдэнэтийн зураг · Зохиогч ба лиценз</a>
+        {features.length > 1 && (
+          <div className="news-feature-controls" role="group" aria-label="Онцлох мэдээ солих">
+            <button type="button" aria-label="Өмнөх мэдээ" onClick={() => setIndex((index + features.length - 1) % features.length)}><ChevronLeft className="h-4 w-4" /></button>
+            {features.map((feature, i) => (
+              <button key={feature.id} className="news-feature-dot" type="button" aria-label={feature.title} aria-pressed={i === index} onClick={() => setIndex(i)}><span /></button>
+            ))}
+            <button type="button" aria-label="Дараагийн мэдээ" onClick={() => setIndex((index + 1) % features.length)}><ChevronRight className="h-4 w-4" /></button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function Announcements() {
   const { announcements, prefs, ready, loadError } = useStore();
-  const [cat, setCat] = useState<(typeof FILTERS)[number]>("all");
+  const [cat, setCat] = useState<NewsFilter>("all");
   const [onlyMine, setOnlyMine] = useState(false);
   const [full, setFull] = useState(false);
   const [query, setQuery] = useState("");
   const [featureIndex, setFeatureIndex] = useState(0);
+  const [searchTarget, setSearchTarget] = useState<HTMLElement | null>(null);
   const now = useNow();
   const ranked = useMemo(() => rankForUser(announcements, prefs), [announcements, prefs]);
   const mine = (a: Announcement) => !!prefs.area && a.location.area === prefs.area;
@@ -256,80 +333,112 @@ export function Announcements() {
   const front = cat === "all" && !full && !term;
   const picks: Announcement[] = [];
   for (const a of byWeight) if (!picks.some((p) => p.category === a.category)) picks.push(a);
-  const features = picks.slice(0, 3);
-  const lead = front ? features[featureIndex % Math.max(features.length, 1)] : byWeight[0];
-  const others = (front ? picks : byWeight).filter((a) => a.id !== lead?.id);
-  const side = front ? [...others].sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt)).slice(0, 3) : [];
-  const cols = front ? others.filter((a) => !side.some((s) => s.id === a.id)).slice(0, 3) : [];
-  const hiddenCount = list.length - 1 - side.length - cols.length;
+  const features = [...picks.filter((a) => !isLive(a) && !isDemo(a)), ...picks.filter((a) => isLive(a) || isDemo(a))].slice(0, 3);
+  const slide = featureIndex % Math.max(features.length, 1);
+  const lead = byWeight[0];
+  const others = byWeight.slice(1);
+  const cards = picks.filter((a) => a.id !== features[slide]?.id).slice(0, 3);
+  const used = new Set([...cards.map((a) => a.id), features[slide]?.id]);
+  const latest = list.filter((a) => !used.has(a.id)).sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt)).slice(0, 4);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setSearchTarget(document.getElementById("news-search-desktop")));
+    const onCategory = (event: Event) => {
+      const { detail } = event as CustomEvent<NewsFilter>;
+      if (!ALL_FILTERS.includes(detail)) return;
+      setCat(detail); setQuery(""); setFull(false); setFeatureIndex(0);
+    };
+    window.addEventListener("smart-orkhon-news-category", onCategory);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("smart-orkhon-news-category", onCategory);
+    };
+  }, []);
 
   // A bell link to a notice that is not on the front page opens the full list first.
   useEffect(() => {
     const go = () => {
       const h = location.hash;
-      if (!h.startsWith("#ann-") || document.getElementById(h.slice(1))) return;
+      if (!h.startsWith("#ann-")) return;
+      let id = h.slice(1);
+      try { id = decodeURIComponent(id); } catch { /* keep the literal ID */ }
+      if (document.getElementById(id)) return;
       setCat("all"); setOnlyMine(false); setQuery(""); setFull(true);
-      setTimeout(() => document.getElementById(h.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
     };
     window.addEventListener("hashchange", go);
     return () => window.removeEventListener("hashchange", go);
   }, []);
 
   const showAll = () => { setFull(true); setTimeout(() => document.getElementById("notices")?.scrollIntoView({ behavior: "smooth" }), 30); };
+  const selectCategory = (filter: NewsFilter) => { setCat(filter); setFull(false); setFeatureIndex(0); };
 
   return (
-    <section id="notices" className="editorial mx-auto max-w-7xl scroll-mt-20 px-4 py-10 md:px-6 md:py-14" aria-labelledby="notices-title">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
-        <div><p className="mb-2 text-xs font-bold uppercase tracking-[.18em] text-cyan">SMART ORKHON / МЭДЭЭЛЭЛ</p><h2 id="notices-title" className="font-display text-3xl font-bold tracking-tight md:text-4xl">Хотын мэдээлэл</h2><p className="mt-2 text-sm text-muted">Таны хотод болж буй үйл явдал, чухал мэдэгдэл.</p></div>
-        <label className="flex min-h-11 w-full items-center gap-2 rounded-xl border border-line bg-navy-2 px-3 text-muted sm:w-72"><Search className="h-4 w-4 shrink-0" /><span className="sr-only">Мэдээлэл хайх</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Мэдээлэл хайх..." className="w-full bg-transparent text-sm text-snow outline-none placeholder:text-muted" /></label>
+    <section id="notices" className="editorial news-section mx-auto max-w-7xl scroll-mt-20 px-4 pb-10 pt-4 md:px-6" aria-labelledby="notices-title">
+      <h2 id="notices-title" className="sr-only">Хотын мэдээлэл</h2>
+      <div className={cn("mb-3", searchTarget && "min-[960px]:hidden")}>
+        <NewsSearch query={query} onChange={setQuery} />
       </div>
+      {searchTarget && createPortal(<NewsSearch query={query} onChange={setQuery} />, searchTarget)}
 
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Ангиллаар шүүх">
-        {FILTERS.map((f) => (
-          <button key={f} type="button" aria-pressed={cat === f} onClick={() => { setCat(f); if (f === "all") setFull(false); }}
-            className={cn("shrink-0 rounded-md border px-3.5 py-1.5 text-sm font-semibold transition",
-              cat === f ? "border-[#0FA4AF] bg-[#AFDDE5]/40 text-snow" : "border-line text-muted hover:border-[#0FA4AF] hover:text-snow")}>
-            {f === "all" ? "Бүгд" : ANN_CAT[f].label}
-          </button>
-        ))}
+      <div className="news-categories" role="group" aria-label="Ангиллаар шүүх">
+        <span className="news-categories-label">Ангилал</span>
+        <div className="news-categories-scroll">
+          {PRIMARY_FILTERS.map((f) => {
+            const Icon = f === "all" ? null : CAT_ICON[f];
+            return (
+              <button className="news-category" key={f} type="button" aria-pressed={cat === f} onClick={() => selectCategory(f)}>
+                {Icon && <Icon className="h-[17px] w-[17px]" aria-hidden="true" />}
+                {f === "all" ? "Бүгд" : ANN_CAT[f].label}
+              </button>
+            );
+          })}
+        </div>
+        <details className="news-categories-more">
+          <summary className="news-category">{cat !== "all" && MORE_FILTERS.some((filter) => filter === cat) ? ANN_CAT[cat].label : "Бусад"}<ChevronDown className="h-4 w-4" aria-hidden="true" /></summary>
+          <div className="news-categories-menu">
+            {MORE_FILTERS.map((f) => {
+              const Icon = CAT_ICON[f];
+              return (
+                <button type="button" key={f} aria-pressed={cat === f} onClick={(e) => {
+                  selectCategory(f);
+                  const menu = e.currentTarget.closest("details");
+                  if (menu) { menu.open = false; menu.querySelector("summary")?.focus(); }
+                }}>
+                  <Icon className="h-4 w-4" aria-hidden="true" />{ANN_CAT[f].label}
+                </button>
+              );
+            })}
+          </div>
+        </details>
       </div>
 
       {loadError ? <Empty title="Алдаа гарлаа" text={loadError} /> : !ready || !announcements.length ? (
-        <div className="grid gap-4 lg:grid-cols-2"><div className="glass h-32 animate-pulse rounded-lg" /><div className="glass h-32 animate-pulse rounded-lg" /></div>
+        <div className="news-feature animate-pulse" role="status"><span className="sr-only">Мэдээлэл ачаалж байна</span></div>
       ) : !lead ? (
         <Empty title="Энэ шүүлтүүрт мэдэгдэл алга" text="Өөр ангилал эсвэл байршил сонгоно уу." />
       ) : front ? (
         <>
-          <div className="relative flex min-h-[360px] items-end overflow-hidden rounded-2xl bg-[#024950] bg-cover bg-center md:min-h-[400px] md:items-stretch" style={{ backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Erdenet_town_aerial_view.jpg/1280px-Erdenet_town_aerial_view.jpg')" }}>
-            <div className="w-full bg-[#003135]/95 p-5 text-white md:flex md:w-[62%] md:flex-col md:justify-center md:p-9">
-              <span className="inline-flex self-start rounded-md bg-[#964734] px-3 py-1 text-xs font-bold text-white">ОНЦЛОХ МЭДЭЭЛЭЛ</span>
-              <h3 className="mt-4 text-2xl font-bold leading-tight tracking-tight text-white md:text-4xl">{lead.title}</h3>
-              {!isLive(lead) && <p className="mt-3 line-clamp-3 max-w-xl text-sm text-white/90 md:text-base">{lead.summary}</p>}
-              <p className="mt-4 text-xs text-white/80">{lead.organization} · <When a={lead} now={now} />{isDemo(lead) && " · Жишээ"}</p>
-              <Link href={`/news/${encodeURIComponent(lead.id)}`} className="mt-4 inline-flex min-h-10 items-center gap-2 self-start rounded-lg bg-[#0FA4AF] px-4 text-sm font-bold text-[#003135]">Дэлгэрэнгүй <ArrowRight className="h-4 w-4" /></Link>
+          <Featured features={features} index={slide} setIndex={setFeatureIndex} now={now} />
+          <div className="news-columns">
+            {cards.length > 0 && (
+              <div className="min-w-0">
+                <NewsHeading>Онцлох мэдээ</NewsHeading>
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {cards.map((a, i) => <Column key={a.id} a={a} now={now} wide={i === 0} />)}
+                </ul>
+              </div>
+            )}
+            <div className="news-latest min-w-0">
+              <NewsHeading>Сүүлийн мэдээ</NewsHeading>
+              <ul>{latest.map((a) => <Side key={a.id} a={a} now={now} />)}</ul>
+              <div className="mt-4 flex justify-end">
+                <button type="button" onClick={showAll} className="news-all-link">
+                  Бүх мэдээг үзэх <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-xs text-muted"><a href="https://commons.wikimedia.org/wiki/File:Erdenet_town_aerial_view.jpg" target="_blank" rel="noopener noreferrer" className="underline">Эрдэнэт хотын ерөнхий зураг · Erdii123</a> / <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline">CC BY-SA 4.0</a> · Зургийг тайрч харуулав</p>
-            {features.length > 1 && <div className="flex items-center gap-2"><span className="text-xs font-semibold text-muted">{featureIndex % features.length + 1} / {features.length}</span><button type="button" aria-label="Өмнөх мэдээлэл" onClick={() => setFeatureIndex((i) => (i + features.length - 1) % features.length)} className="grid h-9 w-9 place-items-center rounded-full border border-line hover:border-cyan"><ChevronLeft className="h-4 w-4" /></button><button type="button" aria-label="Дараагийн мэдээлэл" onClick={() => setFeatureIndex((i) => (i + 1) % features.length)} className="grid h-9 w-9 place-items-center rounded-full border border-line hover:border-cyan"><ChevronRight className="h-4 w-4" /></button></div>}
-          </div>
-          <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1.55fr_1fr]">
-            <div><h3 className="mb-4 border-b-2 border-snow pb-3 text-lg font-bold">Онцлох мэдээ</h3><Lead key={lead.id} a={lead} now={now} mine={mine(lead)} /></div>
-            {side.length > 0 && <div><h3 className="border-b-2 border-snow pb-3 text-lg font-bold">Сүүлийн мэдээлэл</h3><ul className="divide-y divide-line">{side.map((a) => <Side key={a.id} a={a} now={now} />)}</ul></div>}
-          </div>
-          {cols.length > 0 && (
-            <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {cols.map((a) => <Column key={a.id} a={a} now={now} />)}
-            </ul>
-          )}
-          {hiddenCount > 0 && (
-            <div className="mt-6 flex justify-center">
-              <button type="button" onClick={showAll}
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-line bg-white px-4 text-sm font-semibold text-snow transition hover:border-cyan/50 hover:text-cyan">
-                Бүх мэдэгдлийг харах (+{hiddenCount})<ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          )}
         </>
       ) : (
         <div className="grid items-start gap-6 lg:grid-cols-[1.45fr_1fr]">
@@ -337,7 +446,7 @@ export function Announcements() {
           <div>
             <div className="flex items-center justify-between border-b-2 border-snow pb-1.5">
               <p className="text-[13px] font-bold uppercase tracking-wider">{cat === "all" ? "Бүх мэдэгдэл" : ANN_CAT[cat].label}</p>
-              {cat === "all" && (
+              {cat === "all" && full && (
                 <button type="button" onClick={() => setFull(false)} className="inline-flex min-h-9 items-center gap-1 text-[13px] font-semibold text-cyan">
                   <ArrowLeft className="h-3.5 w-3.5" />Нүүр
                 </button>
@@ -352,7 +461,7 @@ export function Announcements() {
       <Card className="mt-8 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-semibold">Миний байршил</p>
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted"><input type="checkbox" className="h-4 w-4 accent-[#0FA4AF]" checked={onlyMine} onChange={(e) => setOnlyMine(e.target.checked)} />Зөвхөн миний бүс</label>
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted"><input type="checkbox" className="h-4 w-4 accent-[var(--news-accent)]" checked={onlyMine} onChange={(e) => setOnlyMine(e.target.checked)} />Зөвхөн миний бүс</label>
         </div>
         <LocationPicker compact />
       </Card>

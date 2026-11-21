@@ -1,5 +1,5 @@
 import { StoreProvider } from "@/lib/store";
-import { Header } from "@/components/Header";
+import { DesktopNavigation, Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Announcements } from "@/components/Announcements";
 import { ReportSection } from "@/components/ReportSection";
@@ -17,20 +17,25 @@ export default function Home() {
   return (
     <StoreProvider>
       <a href="#notices" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-lg focus:bg-cyan focus:px-4 focus:py-2 focus:text-navy">Мэдэгдэл рүү шилжих</a>
-      <Header />
-      <AlertBanner />
-      <main>
-        <Hero />
-        <AlertsSection />
-        <Announcements />
-        <MapSection />
-        <ServicesSection />
-        <VisitorSection />
-        <ReportSection />
-        <ResultsSection />
-        <AppSection />
-      </main>
-      <Footer />
+      <div id="home" className="mx-auto min-h-dvh max-w-[96rem] min-[960px]:grid min-[960px]:grid-cols-[clamp(10.75rem,15.7vw,13.75rem)_minmax(0,1fr)]">
+        <DesktopNavigation />
+        <div className="min-w-0">
+          <Header />
+          <AlertBanner />
+          <main>
+            <Announcements />
+            <Hero />
+            <AlertsSection />
+            <MapSection />
+            <ServicesSection />
+            <VisitorSection />
+            <ReportSection />
+            <ResultsSection />
+            <AppSection />
+          </main>
+          <Footer />
+        </div>
+      </div>
       <MobileTabBar />
       <ChatWidget />
       <Toast />

@@ -22,7 +22,7 @@ function Apartment({ x, y, w, h, floors, cols, seed, tone, night }: { x: number;
     wins.push(
       <rect key={`${f}-${c}`} x={x + 5 + c * cw} y={y + 6 + f * fh} width={cw * 0.55} height={fh * 0.5} rx={0.6}
         fill={lit ? (r > 0.85 ? "#cfe2ff" : "#ffd98a") : night ? "#183a5c" : "#a9cce0"} opacity={lit ? 0.9 : 0.8}
-        className={lit && r > 0.93 ? "window-blink" : undefined} />,
+        className={lit && r > 0.93 ? "city-theme-paint window-blink" : "city-theme-paint"} />,
     );
   }
   return (
@@ -76,8 +76,10 @@ function Lamp({ x, y, night }: { x: number; y: number; night: boolean }) {
     <g>
       <rect x={x - 0.8} y={y - 26} width={1.6} height={26} fill="#5d7690" />
       <path d={`M${x} ${y - 26} q6 -2 9 1`} stroke="#5d7690" strokeWidth={1.6} fill="none" />
-      {night && <circle className="lamp-glow" cx={x + 9} cy={y - 24} r={9} fill="url(#lampGlow)" style={{ animationDelay: `${(x % 7) * 0.4}s` }} />}
-      <circle cx={x + 9} cy={y - 24.5} r={1.8} fill={night ? "#fff6c9" : "#dce5eb"} />
+      <g className="city-theme-paint" opacity={night ? 1 : 0}>
+        <circle className={night ? "lamp-glow" : undefined} cx={x + 9} cy={y - 24} r={9} fill="url(#lampGlow)" style={{ animationDelay: `${(x % 7) * 0.4}s` }} />
+      </g>
+      <circle className="city-theme-paint" cx={x + 9} cy={y - 24.5} r={1.8} fill={night ? "#fff6c9" : "#dce5eb"} />
     </g>
   );
 }
@@ -127,9 +129,9 @@ function CityIllustrationBase({ onZone, active, night }: { onZone: (z: ZoneId) =
       aria-label="Эрдэнэт хот, Орхон аймгийн уран сайхны 2D дүрслэл: ил уурхай, баяжуулах үйлдвэр, орон сууц, гэр хороолол, зам, толгод">
       <defs>
         <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={night ? "#04101e" : "#7dbbe4"} />
-          <stop offset="0.55" stopColor={night ? "#0a2340" : "#b9def1"} />
-          <stop offset="1" stopColor={night ? "#123a5a" : "#e2f1f7"} />
+          <stop className="city-theme-paint" offset="0" stopColor={night ? "#141424" : "#7dbbe4"} />
+          <stop className="city-theme-paint" offset="0.55" stopColor={night ? "#332653" : "#b9def1"} />
+          <stop className="city-theme-paint" offset="1" stopColor={night ? "#234d60" : "#e2f1f7"} />
         </linearGradient>
         <linearGradient id="mtn1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1b3e5e" /><stop offset="1" stopColor="#0d2741" /></linearGradient>
         <linearGradient id="mtn2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#11524f" /><stop offset="1" stopColor="#0b3238" /></linearGradient>
@@ -144,22 +146,25 @@ function CityIllustrationBase({ onZone, active, night }: { onZone: (z: ZoneId) =
 
       {/* sky */}
       <rect width="1200" height="620" fill="url(#sky)" />
-      {night && Array.from({ length: 46 }, (_, i) => (
-        <circle key={i} cx={rnd(i) * 1200} cy={rnd(i + 99) * 190} r={rnd(i + 7) * 1.3 + 0.3} fill="#e6fbff" opacity={0.25 + rnd(i + 3) * 0.5} />
-      ))}
-      <circle cx={1010} cy={92} r={48} fill={night ? "url(#moon)" : "#ffe6a1"} opacity={night ? 0.35 : 0.4} />
-      <circle cx={1010} cy={92} r={22} fill={night ? "#eafcff" : "#fff2bd"} opacity={0.92} />
+      <g className="city-theme-paint" opacity={night ? 1 : 0}>
+        {Array.from({ length: 46 }, (_, i) => (
+          <circle key={i} cx={rnd(i) * 1200} cy={rnd(i + 99) * 190} r={rnd(i + 7) * 1.3 + 0.3} fill="#e6fbff" opacity={0.25 + rnd(i + 3) * 0.5} />
+        ))}
+      </g>
+      <circle className="city-theme-paint" cx={1010} cy={92} r={48} fill="#ffe6a1" opacity={night ? 0 : 0.4} />
+      <circle className="city-theme-paint" cx={1010} cy={92} r={48} fill="url(#moon)" opacity={night ? 0.35 : 0} />
+      <circle className="city-theme-paint" cx={1010} cy={92} r={22} fill={night ? "#eafcff" : "#fff2bd"} opacity={0.92} />
 
       {/* clouds */}
       {[{ y: 70, d: 70, s: 1, o: 0.12 }, { y: 130, d: 95, s: 0.7, o: 0.09 }, { y: 48, d: 120, s: 1.3, o: 0.07 }].map((c, i) => (
         <g key={i} className="cloud" style={{ animationDuration: `${c.d}s`, animationDelay: `${-i * 25}s` }}>
-          <g transform={`translate(0 ${c.y}) scale(${c.s})`} opacity={night ? c.o : c.o * 4} fill="#ffffff">
+          <g className="city-theme-paint" transform={`translate(0 ${c.y}) scale(${c.s})`} opacity={night ? c.o : c.o * 4} fill="#ffffff">
             <ellipse cx={60} cy={10} rx={60} ry={14} /><ellipse cx={95} cy={0} rx={38} ry={16} /><ellipse cx={40} cy={2} rx={28} ry={12} />
           </g>
         </g>
       ))}
 
-      <g style={night ? undefined : { filter: "brightness(1.3) saturate(.85)" }}>
+      <g className="city-theme-terrain" style={{ filter: night ? "brightness(1) saturate(1)" : "brightness(1.3) saturate(.85)" }}>
       {/* far mountains */}
       <path d="M0 270 L90 205 L170 240 L260 170 L360 232 L450 188 L560 236 L660 176 L760 226 L860 168 L960 222 L1060 186 L1200 236 V620 H0 Z" fill="url(#mtn1)" />
       <path d="M260 170 L285 186 L272 190 L258 182 Z M660 176 L690 194 L672 196 Z M860 168 L888 186 L870 188 Z" fill="#d9f6ff" opacity={0.18} />
@@ -259,7 +264,7 @@ function CityIllustrationBase({ onZone, active, night }: { onZone: (z: ZoneId) =
 
       {/* streetlights + foreground */}
       {[60, 200, 340, 480, 700, 840, 980, 1120].map((x) => <Lamp key={x} x={x} night={night} y={500 - Math.abs(600 - x) * -0.0 - (x > 600 ? (x - 600) * 0.03 : (600 - x) * 0.03) + 18} />)}
-      <path d="M0 560 Q600 540 1200 560 V620 H0 Z" fill={night ? "#061322" : "#315e5a"} opacity={0.85} />
+      <path className="city-theme-paint" d="M0 560 Q600 540 1200 560 V620 H0 Z" fill={night ? "#10101f" : "#315e5a"} opacity={0.85} />
       {[30, 110, 190, 1010, 1090, 1170].map((x, i) => <Pine key={x} x={x} y={600} s={0.9 + rnd(i) * 0.3} c="#0b4b3f" />)}
       </g>
     </svg>

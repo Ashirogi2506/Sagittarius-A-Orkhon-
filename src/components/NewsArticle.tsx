@@ -36,7 +36,12 @@ export function NewsArticle({ id }: { id: string }) {
           </div>
         ) : (
           <article className="mt-10">
-            <div className="flex flex-wrap gap-2 text-xs font-bold"><span className="rounded-full bg-[#AFDDE5] px-3 py-1 text-[#003135]">{ANN_CAT[article.category].label}</span>{(article.verification === "demo" || article.verification === "unverified") && <span className="rounded-full border border-line px-3 py-1 text-warn">{VERIFY[article.verification].label}</span>}</div>
+            <div className="flex flex-wrap gap-2 text-xs font-bold">
+              <span className="news-tag">{ANN_CAT[article.category].label}</span>
+              {(article.verification === "demo" || article.verification === "unverified") && (
+                <span className="rounded-full border border-line px-3 py-1 text-warn">{VERIFY[article.verification].label}</span>
+              )}
+            </div>
             <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight md:text-5xl">{article.title}</h1>
             <p className="mt-5 text-sm text-muted">{article.organization} · <time dateTime={article.publishedAt}>{fmtUB(article.publishedAt)}</time></p>
             <div className="mt-8 border-t border-line pt-8 text-lg leading-relaxed">
