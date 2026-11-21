@@ -21,17 +21,16 @@ const verifiedIcon = L.divIcon({
   iconSize: [26, 26], iconAnchor: [13, 13],
 });
 
-// Camera marker: coloured by load, shows the vehicle count, pulses when congested. Grey "–" = no count.
+// Camera marker: colour indicates load; dashed grey means no data.
 const camIcon = (c: CameraSpot, active: boolean) => {
   const col = trafficColor(c.rank);
-  const size = (active ? 34 : 28) - (c.rank < 0 ? 6 : 0);
+  const size = active ? 26 : 20;
   return L.divIcon({
     className: "",
-    html: `<div class="${c.rank >= 1 ? "marker-dot" : ""}" style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background:#f5f7fa;border:3px ${c.rank < 0 ? "dashed" : "solid"} ${col};color:${c.rank < 0 ? "#5b6b82" : col};display:grid;place-items:center;font:700 12px/1 sans-serif;box-shadow:0 0 ${c.rank >= 1 ? 18 : c.rank === 0 ? 8 : 0}px ${col}">${c.vehicles ?? "–"}</div>`,
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:#fff;border:3px ${c.rank < 0 ? "dashed" : "solid"} ${col};box-shadow:0 1px 5px #0005"></div>`,
     iconSize: [size, size], iconAnchor: [size / 2, size / 2],
   });
 };
-const hm = (iso: string) => new Date(iso).toLocaleTimeString("mn-MN", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Ulaanbaatar" });
 
 // Road sections within NEAR_M of a counting camera take that camera's colour; everything else stays grey (no data).
 const NEAR_M = 250;
@@ -108,8 +107,8 @@ export default function LeafletMap({ issues, selected, onSelect, showVerified, o
       ))}
       {cameras.map((c) => (
         <Marker key={c.name} position={[c.lat, c.lng]} icon={camIcon(c, c.name === selectedCam)} zIndexOffset={c.rank * 100 + 500}
-          eventHandlers={{ click: () => onSelectCam?.(c.name) }} keyboard title={c.vehicles == null ? `${c.name}: ${c.levelLabel}` : `${c.name}: ${c.levelLabel}, ${c.vehicles} машин`}>
-          <Tooltip direction="top" offset={[0, -14]}>{c.vehicles == null || !c.detectedAt ? `${c.name} · ${c.levelLabel.toLowerCase()} (шууд бичлэгийг dedtuv дээр харна)` : `${c.name} · ${c.levelLabel.toLowerCase()} · ${c.vehicles} машин (${hm(c.detectedAt)})`}</Tooltip>
+          eventHandlers={{ click: () => onSelectCam?.(c.name) }} keyboard title={`${c.name}: ${c.levelLabel}`}>
+          <Tooltip direction="top" offset={[0, -14]}>{c.name} · {c.levelLabel.toLowerCase()}</Tooltip>
         </Marker>
       ))}
       {outages.map((a) => (

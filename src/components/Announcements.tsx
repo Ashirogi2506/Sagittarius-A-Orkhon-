@@ -71,15 +71,13 @@ function Byline({ a, now }: { a: Announcement; now: number | null }) {
   );
 }
 
-/** A colour panel with the category icon stands in for a photo; nothing pictured is invented. */
-function Tile({ a, className, icon }: { a: Announcement; className?: string; icon: string }) {
+/** A small category mark keeps headlines easy to scan without a large image. */
+function Watermark({ a, className }: { a: Announcement; className?: string }) {
   const { color } = ANN_CAT[a.category];
   const Icon = CAT_ICON[a.category];
   return (
-    <div aria-hidden="true" className={cn("relative grid shrink-0 place-items-center overflow-hidden rounded-md", className)}
-      style={{ background: `linear-gradient(135deg, ${color}38, ${color}12)` }}>
-      <Icon className={icon} style={{ color }} strokeWidth={1.6} />
-    </div>
+    <Icon aria-hidden="true" className={cn("pointer-events-none absolute right-3 top-3 h-5 w-5 opacity-30", className)}
+      style={{ color }} strokeWidth={1.7} />
   );
 }
 
@@ -135,10 +133,10 @@ function Lead({ a, now, mine }: { a: Announcement; now: number | null; mine: boo
   const [open, toggle] = useOpen(a);
   const cat = ANN_CAT[a.category];
   return (
-    <article id={`ann-${a.id}`} className="scroll-mt-24">
-      <button type="button" onClick={toggle} aria-expanded={open} className="block w-full text-left">
-        <Tile a={a} className="aspect-[2/1] w-full md:aspect-[16/7]" icon="h-20 w-20 md:h-28 md:w-28" />
-        <span className="mt-3 flex flex-wrap items-center gap-1.5">
+    <article id={`ann-${a.id}`} className="relative scroll-mt-24 rounded-lg border border-line bg-navy-2 p-4 md:p-5">
+      <Watermark a={a} />
+      <button type="button" onClick={toggle} aria-expanded={open} className="block w-full pr-7 text-left">
+        <span className="flex flex-wrap items-center gap-1.5">
           <span className="text-[13px] font-bold uppercase tracking-wider" style={{ color: cat.color }}>{cat.label}</span>
           <Tags a={a} st={statusOf(a, now)} mine={mine} />
         </span>
@@ -161,9 +159,9 @@ function Lead({ a, now, mine }: { a: Announcement; now: number | null; mine: boo
 function Side({ a, now }: { a: Announcement; now: number | null }) {
   const [open, toggle] = useOpen(a);
   return (
-    <li id={`ann-${a.id}`} className="scroll-mt-24 py-3 first:pt-0">
-      <button type="button" onClick={toggle} aria-expanded={open} className="flex w-full items-start gap-3 text-left">
-        <Tile a={a} className="h-[72px] w-[72px] md:h-24 md:w-28" icon="h-8 w-8 md:h-10 md:w-10" />
+    <li id={`ann-${a.id}`} className="relative scroll-mt-24 py-3">
+      <Watermark a={a} />
+      <button type="button" onClick={toggle} aria-expanded={open} className="flex w-full items-start gap-3 pr-8 text-left">
         <span className="min-w-0 flex-1">
           <span className="block text-[12px] font-bold uppercase tracking-wider" style={{ color: ANN_CAT[a.category].color }}>{ANN_CAT[a.category].label}</span>
           <span className="mt-0.5 line-clamp-3 text-[15px] font-semibold leading-snug md:text-base">{a.title}</span>
@@ -184,8 +182,9 @@ function Side({ a, now }: { a: Announcement; now: number | null }) {
 function Column({ a, now }: { a: Announcement; now: number | null }) {
   const [open, toggle] = useOpen(a);
   return (
-    <li id={`ann-${a.id}`} className="scroll-mt-24 py-3 md:py-0">
-      <button type="button" onClick={toggle} aria-expanded={open} className="block w-full text-left">
+    <li id={`ann-${a.id}`} className="relative scroll-mt-24 py-3 md:py-0">
+      <Watermark a={a} className="top-3 md:top-0" />
+      <button type="button" onClick={toggle} aria-expanded={open} className="block w-full pr-8 text-left">
         <span className="block text-[12px] font-bold uppercase tracking-wider" style={{ color: ANN_CAT[a.category].color }}>{ANN_CAT[a.category].label}</span>
         <span className="mt-0.5 block font-display text-[17px] font-bold leading-snug md:text-lg">{a.title}</span>
         {!isLive(a) && <span className={cn("mt-1 block text-sm leading-relaxed text-muted", !open && "line-clamp-2")}>{a.summary}</span>}
@@ -203,7 +202,8 @@ function Row({ a, now, mine }: { a: Announcement; now: number | null; mine: bool
   const cat = ANN_CAT[a.category];
   const st = statusOf(a, now);
   return (
-    <li id={`ann-${a.id}`} className="scroll-mt-24">
+    <li id={`ann-${a.id}`} className="relative scroll-mt-24">
+      <Watermark a={a} className="right-8" />
       <button type="button" onClick={toggle} aria-expanded={open} className="flex min-h-11 w-full items-start gap-3 py-3 text-left">
         <span className="mt-[7px] h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: cat.color }} aria-hidden="true" />
         <span className="min-w-0 flex-1">
@@ -231,13 +231,13 @@ function Row({ a, now, mine }: { a: Announcement; now: number | null; mine: bool
 const FILTERS: ("all" | AnnouncementCategory)[] = ["all", "traffic", "water", "electricity", "road", "transport", "waste", "environment", "service", "emergency"];
 
 export function Announcements() {
-  const { announcements, prefs, ready, loadError, traffic } = useStore();
+  const { announcements, prefs, ready, loadError } = useStore();
   const [cat, setCat] = useState<(typeof FILTERS)[number]>("all");
   const [onlyMine, setOnlyMine] = useState(false);
   const [full, setFull] = useState(false);
   const now = useNow();
   const ranked = useMemo(() => rankForUser(announcements, prefs), [announcements, prefs]);
-  const mine = (a: Announcement) => (!!prefs.area && a.location.area === prefs.area) || (!!prefs.bag && a.location.bag === prefs.bag);
+  const mine = (a: Announcement) => !!prefs.area && a.location.area === prefs.area;
   const list = ranked.filter((a) => (cat === "all" || a.category === cat) && (!onlyMine || mine(a)));
   // Real before sample, happening now or soon, then the reader's area, then the most serious category.
   const weight = (a: Announcement) => (isDemo(a) ? 0 : 40) + STATUS_WEIGHT[String(statusOf(a, now))] + (mine(a) ? 6 : 0) + (CAT_WEIGHT[a.category] ?? 1);
@@ -270,19 +270,6 @@ export function Announcements() {
     <section id="notices" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-10 md:px-6 md:py-14" aria-labelledby="notices-title">
       <h2 id="notices-title" className="sr-only">Мэдэгдэл</h2>
 
-      {prefs.topics.traffic && (
-        <p className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm" aria-live="polite">
-          <span className="inline-flex items-center gap-1.5 rounded bg-alert px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
-            <span className="h-1.5 w-1.5 rounded-full bg-white" />Зам
-          </span>
-          <span className="text-snow/90">
-            {!traffic ? "Шалгаж байна…" : !traffic.ok ? "Замын мэдээлэл одоогоор алга."
-              : traffic.busy.length ? `Түгжрэлтэй: ${traffic.busy.slice(0, 3).map((b) => b.name).join(", ")}${traffic.busy.length > 3 ? ` ба өөр ${traffic.busy.length - 3}` : ""}.`
-              : "Одоогоор зам түгжрэлгүй."}
-          </span>
-        </p>
-      )}
-
       <div className="mb-5 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Ангиллаар шүүх">
         {FILTERS.map((f) => (
           <button key={f} type="button" aria-pressed={cat === f} onClick={() => { setCat(f); if (f === "all") setFull(false); }}
@@ -294,7 +281,7 @@ export function Announcements() {
       </div>
 
       {loadError ? <Empty title="Алдаа гарлаа" text={loadError} /> : !ready || !announcements.length ? (
-        <div className="grid gap-6 lg:grid-cols-[1.45fr_1fr]"><div className="glass aspect-[2/1] animate-pulse rounded-lg" /><div className="glass h-64 animate-pulse rounded-lg" /></div>
+        <div className="grid gap-4 lg:grid-cols-2"><div className="glass h-32 animate-pulse rounded-lg" /><div className="glass h-32 animate-pulse rounded-lg" /></div>
       ) : !lead ? (
         <Empty title="Энэ шүүлтүүрт мэдэгдэл алга" text="Өөр ангилал эсвэл байршил сонгоно уу." />
       ) : front ? (
@@ -342,7 +329,6 @@ export function Announcements() {
         </div>
         <LocationPicker compact />
       </Card>
-      <p className="mt-3 text-xs text-muted">«Жишээ» шошготой зар бодит биш.</p>
     </section>
   );
 }
